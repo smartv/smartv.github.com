@@ -94,14 +94,6 @@
     <ul id="menu" class="menu ">
       
         
-        <li class="menu-item menu-item-home">
-          <a href="/">
-            <i class="menu-item-icon icon-home"></i> <br />
-            首頁
-          </a>
-        </li>
-      
-        
         <li class="menu-item menu-item-categories">
           <a href="/categories">
             <i class="menu-item-icon icon-categories"></i> <br />
@@ -125,14 +117,6 @@
           </a>
         </li>
       
-        
-        <li class="menu-item menu-item-tags">
-          <a href="/tags">
-            <i class="menu-item-icon icon-tags"></i> <br />
-            標籤
-          </a>
-        </li>
-      
     </ul>
   
 
@@ -148,6 +132,78 @@
         <div id="content" class="content">
           
   <div id="posts" class="posts-expand">
+    
+      
+
+  <div class="post post-type-normal ">
+    <div class="post-header">
+
+      
+      
+        <h1 class="post-title">
+          
+          
+            
+              <a class="post-title-link" href="/2015/07/17/notes-synthesize/">
+                iOS 学习笔记—@synthesize合成指令
+              </a>
+            
+          
+        </h1>
+      
+
+      <div class="post-meta">
+        <span class="post-time">
+          發表於 2015-07-17
+        </span>
+
+        
+
+        
+          
+        
+      </div>
+    </div>
+
+    <div class="post-body">
+
+      
+      
+
+      
+        
+          <p>许多编程语言中，在程序员编写一个<figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&#10;</span><br></pre></td></tr></table></figure></p>
+<p>@property NSString *firstName;</p>
+<figure class="highlight autohotkey"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">因此 Xcode <span class="number">4.4</span>的以前的版本给程序员提供了<span class="escape">``</span><span class="escape">`@</span>sythesize<span class="escape">``</span><span class="escape">`关</span>键字来生成下划线开头的成员变量，每当声明一个属性之后都必须用<span class="escape">``</span><span class="escape">`@</span>sythesize<span class="escape">``</span><span class="escape">`在</span><span class="escape">``</span><span class="escape">`i</span>mplementation<span class="escape">``</span><span class="escape">`里</span>面告诉编译器，编译器才会给生成下划线开头的成员变量方法。下面代码做个演示。</span><br></pre></td></tr></table></figure>
+<p>@property (nonatomic,strong) NSString *someProperty;//声明一个变量</p>
+<p>@sythesize someProperty = _someProperty； // 必须使用 合成指令告诉编译器，其才会生成该属性需要的成员变量。</p>
+<figure class="highlight autohotkey"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">因为这样，Xcode <span class="number">4.4</span>以前版本的程序员做开发比较郁闷的时候，就是需要声明很多属性的时候就会出现一堆<span class="escape">``</span><span class="escape">`@</span>sythesize<span class="escape">``</span><span class="escape">`。</span>之后，苹果发现这个问题之后呢，在 Xcode <span class="number">4.5</span>以后的版本对其进行改进，不再需要程序员手动去调用<span class="escape">``</span><span class="escape">`@</span>sythesize<span class="escape">``</span><span class="escape">`指</span>令也可以自动生成带下划线的成员变量了。</span><br></pre></td></tr></table></figure>
+<p>  @interface parentViewController（）<br>  @property (nonatomic,strong) NSString *someProperty; //父类的属性<br>  @end</p>
+<p>  @implementation childViewController<br>  @sythesize someProperty = _someProperty；<br>  @(void)someMethod<br>  {<br>       self.someProperty //循环引用..<br>  }<br>  @end<br>```</p>
+<p>这么一来简化了程序员的工作量，但是当成员变量出现在父类的情况下，子类如果需要调用父类的成员变量时，编译器不会给子类也生成相应的下划线成员变量。Xcode 则推荐我们使用<code>self</code>关键字。但是通过<code>self.someProperty</code>调用父类的成员变量时候，是调用属性的<code>getter</code>方法，<code>getter</code> 调用时候再 <code>getter</code> 自己的时候就会形成循环引用的问题。</p>
+<p>明白了这个之后，往后在子类调用父类的变量时候，手动调用一下<code>@sythesize</code>就可以了。</p>
+<p>参考：</p>
+<p><a href="https://developer.apple.com/library/mac/documentation/Cocoa/Conceptual/ProgrammingWithObjectiveC/EncapsulatingData/EncapsulatingData.html#//apple_ref/doc/uid/TP40011210-CH5-SW1" target="_blank" rel="external">Programming with Objective-C</a></p>
+<p><a href="http://stackoverflow.com/questions/3266467/what-exactly-does-synthesize-do" target="_blank" rel="external">What exactly does @synthesize do?</a></p>
+<p><a href="http://stackoverflow.com/questions/15606151/objective-c-is-synthesize-required-or-optional" target="_blank" rel="external">Objective-C is @synthesize required or optional?</a></p>
+
+        
+      
+    </div>
+
+    <div class="post-footer">
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </div>
+  </div>
+
+
     
       
 
@@ -410,7 +466,7 @@
         <div class="site-state motion-element">
           <div class="site-state-item site-state-posts">
             <a href="/archives">
-              <span class="site-state-item-count">3</span>
+              <span class="site-state-item-count">4</span>
               <span class="site-state-item-name">文章</span>
             </a>
           </div>
@@ -423,10 +479,10 @@
           </div>
 
           <div class="site-state-item site-state-tags">
-            <a href="/tags">
-              <span class="site-state-item-count">1</span>
+            
+              <span class="site-state-item-count">2</span>
               <span class="site-state-item-name">標籤</span>
-              </a>
+              
           </div>
 
         </div>
