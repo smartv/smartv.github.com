@@ -144,7 +144,219 @@
           
           
             
-              <a class="post-title-link" href="/2015/07/17/notes-synthesize/">
+              <a class="post-title-link" href="/2015/07/30/ios-notes-media-player/">
+                ios notes media play
+              </a>
+            
+          
+        </h1>
+      
+
+      <div class="post-meta">
+        <span class="post-time">
+          Posted on 2015-07-30
+        </span>
+
+        
+          <span class="post-category">
+            &nbsp; | &nbsp; In
+            
+              <a href="/categories/iOS/">iOS</a>
+
+              
+              
+
+            
+          </span>
+        
+
+        
+          
+            <span class="post-comments-count">
+            &nbsp; | &nbsp;
+            <a href="/2015/07/30/ios-notes-media-player/#comments" >
+              <span class="post-comments-count disqus-comment-count" data-disqus-identifier="2015/07/30/ios-notes-media-player/"></span>
+            </a>
+          </span>
+          
+        
+      </div>
+    </div>
+
+    <div class="post-body">
+
+      
+      
+
+      
+        
+          <h2 id="iOS学习笔记之——媒体播放">iOS学习笔记之——媒体播放</h2><p>在iOS中提供了两种播放媒体的两个类:<code>MPMoviePlayerController</code>和<code>MPMoviePlayerViewController</code>，让我们可以轻松地播放媒体文件。其中<code>MPMoviePlayerViewController</code> 只能全屏播放，下面我们就来动手试一试吧。</p>
+<h5 id="（一）导入依赖项">（一）导入依赖项</h5><p>在写代码之前我们需要引入一个依赖项到XCode：<code>MediaPlayer.Framework</code>。<br>图片。。。。<br><code>MPMoviePlayerController</code>内部有个view用来展示视频内容，添加其他<code>Controller</code>的View上面就可实现播放。目前支持的视频格式有<code>H.264</code>和<code>MPEG-4 Part 2 video</code>两种。支持的文件扩展名为：avi、mkv、mov、m4v、mp4等。可以到苹果官网下载一些用来测试的小<a href="http
+://support.apple.com/kb/ht1424">视频文件</a>。沙盒里面取视频文件</p>
+<h5 id="（二）动手写代码">（二）动手写代码</h5><p>新建一个<code>Controller</code>将头文件导入。</p>
+<pre><code><span class="id">#import</span> <span class="string">"MainViewController.h"</span>
+<span class="id">#import</span> &lt;MediaPlayer/MediaPlayer.h&gt;
+</code></pre><p>声明一个属性</p>
+<pre><code><span class="variable">@interface</span> MainViewController ()
+<span class="variable">@property</span> (strong, nonatomic) MPMoviePlayerController *player;<span class="comment">//注意：如果定义在viewDidLoad中的话将会无法播放、因为出了`viewDidLoad`之后*player会被销毁掉了。</span>
+<span class="variable">@property</span> (strong, nonatomic) UIImageView *imageView;
+<span class="variable">@end</span>
+</code></pre><p>接下来在<code>viewDidLoad</code>里面初始化视频播放器并添加到<code>RootViewController</code></p>
+<pre><code><span class="built_in">NSURL</span> *url = [[<span class="built_in">NSBundle</span> mainBundle]URLForResource:<span class="string">@"promo_full"</span> withExtension:<span class="string">@"mp4"</span>];
+ <span class="keyword">self</span><span class="variable">.player</span> = [[<span class="built_in">MPMoviePlayerController</span> alloc]initWithContentURL:url];
+ [<span class="keyword">self</span><span class="variable">.player</span><span class="variable">.view</span> setFrame:<span class="built_in">CGRectMake</span>(<span class="number">0</span>, <span class="number">0</span>, <span class="number">320</span>, <span class="number">180</span>)];   <span class="comment">//16:9比例</span>
+ [<span class="keyword">self</span><span class="variable">.view</span> addSubview:<span class="keyword">self</span><span class="variable">.player</span><span class="variable">.view</span>];
+ [<span class="keyword">self</span><span class="variable">.player</span> play];
+</code></pre><p>到目前为止我们就可以实现播放视频了。是不是很简单？<br>图片。。。</p>
+<h5 id="（三）思考">（三）思考</h5><p>通常我们使用主流的播放器一般都会有记录上次播放位置、视频页面截图、视频结束弹出广告，如何实现呢。这就需要通过通知中心，以观察者模式监视视频模仿的状态了,下面是一个播放时全屏的例子。</p>
+<pre><code>[[NSNotificationCenter <span class="keyword">default</span>Center]addObserver:<span class="literal">self</span> selector:@selector(<span class="keyword">state</span>Listener) name:MPMoviePlayerPlaybackStateDidChangeNotification object:nil];
+</code></pre><p>接着我们需要写一个监听方法在视频播放的时候<code>MPMoviePlaybackStatePlaying</code>来设置<code>Fullscreen</code>就可以了</p>
+<pre><code>- (<span class="keyword">void</span>)stateListener
+{
+    <span class="keyword">if</span> (<span class="keyword">self</span><span class="variable">.player</span><span class="variable">.playbackState</span>==<span class="built_in">MPMoviePlaybackStatePlaying</span>) {
+            [<span class="keyword">self</span><span class="variable">.player</span> setFullscreen:<span class="literal">YES</span> animated:<span class="literal">YES</span>];    <span class="comment">// 设置全屏播放</span>
+            <span class="built_in">NSLog</span>(<span class="string">@"播放"</span>);
+    }
+}
+<span class="keyword">@end</span>
+</code></pre><p>接下来我们再来实现一个视频截图的功能，首先我们需要准备一个<code>UIImageView</code>加到<code>RootViewController</code>里面来显示我们的截图。</p>
+<pre><code> [[<span class="built_in">NSNotificationCenter</span> defaultCenter]addObserver:<span class="keyword">self</span> selector:<span class="keyword">@selector</span>(caputerImage:) name:<span class="built_in">MPMoviePlayerThumbnailImageRequestDidFinishNotification</span> object:<span class="literal">nil</span>]; 
+
+[<span class="keyword">self</span><span class="variable">.player</span> requestThumbnailImagesAtTimes:@[@<span class="number">10.0</span>f, @<span class="number">20.0</span>f] timeOption:<span class="built_in">MPMovieTimeOptionNearestKeyFrame</span>]; <span class="comment">//指定一个截图时间区间</span>
+<span class="built_in">UIImageView</span> *thumbnailImageView = [[<span class="built_in">UIImageView</span> alloc]initWithFrame:<span class="built_in">CGRectMake</span>(<span class="number">80</span>, <span class="number">200</span>, <span class="number">160</span>, <span class="number">90</span>)];
+<span class="keyword">self</span><span class="variable">.imageView</span> = thumbnailImageView;
+[<span class="keyword">self</span><span class="variable">.view</span> addSubview:thumbnailImageView];
+</code></pre><p>接下来同样需要一个监听方法来完成截图功能。</p>
+<pre><code>- (<span class="keyword">void</span>)caputerImage:(<span class="built_in">NSNotification</span> *)notification
+{
+    <span class="built_in">NSLog</span>(<span class="string">@"截图 %@"</span>, notification);
+    <span class="built_in">UIImage</span> *image = notification<span class="variable">.userInfo</span>[<span class="string">@"MPMoviePlayerThumbnailImageKey"</span>];
+    [<span class="keyword">self</span><span class="variable">.imageView</span> setImage:image];
+}
+</code></pre><h4 id="总结">总结</h4><p>基于苹果给我们封装了很多细节，我们可以很轻松的实现很多常用的功能。还有<code>MPMoviePlayerViewController</code>大体功能差不多就不一一介绍了。</p>
+
+        
+      
+    </div>
+
+    <div class="post-footer">
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </div>
+  </div>
+
+
+    
+      
+
+  <div class="post post-type-normal ">
+    <div class="post-header">
+
+      
+      
+        <h1 class="post-title">
+          
+          
+            
+              <a class="post-title-link" href="/2015/07/30/Swift-what-is-the-AnyObject/">
+                Swift: 什么是 AnyObject
+              </a>
+            
+          
+        </h1>
+      
+
+      <div class="post-meta">
+        <span class="post-time">
+          Posted on 2015-07-30
+        </span>
+
+        
+          <span class="post-category">
+            &nbsp; | &nbsp; In
+            
+              <a href="/categories/iOS/">iOS</a>
+
+              
+              
+
+            
+          </span>
+        
+
+        
+          
+            <span class="post-comments-count">
+            &nbsp; | &nbsp;
+            <a href="/2015/07/30/Swift-what-is-the-AnyObject/#comments" >
+              <span class="post-comments-count disqus-comment-count" data-disqus-identifier="2015/07/30/Swift-what-is-the-AnyObject/"></span>
+            </a>
+          </span>
+          
+        
+      </div>
+    </div>
+
+    <div class="post-body">
+
+      
+      
+
+      
+        
+          <h2 id="什么是AnyObjct">什么是AnyObjct</h2><p>为了方便理解你可以将 <code>AnyObject</code> 类比成一种类型，就像 <code>Array</code> 或 <code>Double</code> 一样，但事实上它并不是一种类型。它主要用于兼容现有的 Objective-c API 和 iOS 代码， <code>AnyObject</code> 可以用来构建自己的数据结构，但并不经常使用。这有点不像 Swift，因为 Swift 是强类型语言，并且有类型推断的特性。 <code>AnyObject</code> 是只想一个对象（未知类）的指针，这有点奇怪哈。</p>
+<h2 id="什么时候用到_AnyObject">什么时候用到 AnyObject</h2><p>有可能在变量中见到：</p>
+<figure class="highlight kotlin"><table><tr><td class="code"><pre><span class="line"><span class="variable"><span class="keyword">var</span> destinationViewController</span>: AnyObject</span><br><span class="line"><span class="variable"><span class="keyword">var</span> toolbarItems</span>: [AnyObject]</span><br></pre></td></tr></table></figure>
+<p>或者在方法参数中出现：</p>
+<figure class="highlight swift"><table><tr><td class="code"><pre><span class="line"><span class="func"><span class="keyword">func</span> <span class="title">prepareForSegue</span><span class="params">(segue: UIStoryboardSegue, sender: AnyObject)</span></span></span><br><span class="line"><span class="func"><span class="keyword">func</span> <span class="title">addConstraints</span><span class="params">(constrains: [AnyObject])</span></span></span><br><span class="line"><span class="func"><span class="keyword">func</span> <span class="title">appendString</span><span class="params">(sender: AnyObject)</span></span></span><br></pre></td></tr></table></figure>
+<p>甚至可以作为一个方法的返回值：</p>
+<figure class="highlight delphi"><table><tr><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="function"><span class="keyword">function</span> <span class="title">buttonWithType</span><span class="params">(buttonType: UIButtonType)</span> -&gt; <span class="title">AnyObject</span></span></span><br></pre></td></tr></table></figure>
+<p>在我们使用 Storyboard 进行连线时候出现：</p>
+<h2 id="如何使用_AnyObject">如何使用 AnyObject</h2><p>既然它是指针，我们就不可能发送任何消息给它。<code>为了使用它，我们要把它转换成一种我们已知的类型，这也是我们唯一使用它的方式</code> 例如：</p>
+<figure class="highlight cs"><table><tr><td class="code"><pre><span class="line"><span class="keyword">var</span> destinationViewController: AnyObject</span><br><span class="line"><span class="keyword">let</span> planVC = destinationViewController <span class="keyword">as</span> planInfoViewController</span><br></pre></td></tr></table></figure>
+<p>如果 dvc 为空，会 Crash</p>
+<p>安全转换有两种办法避免：</p>
+<figure class="highlight nimrod"><table><tr><td class="code"><pre><span class="line"><span class="keyword">if</span> <span class="keyword">let</span> planVC = destinationViewController <span class="keyword">as</span>? planInfoViewController <span class="decorator">&#123;...&#125;</span> // <span class="keyword">as</span>? 会返回一个 <span class="type">Optional</span> 版本</span><br></pre></td></tr></table></figure>
+<p>or</p>
+<figure class="highlight nimrod"><table><tr><td class="code"><pre><span class="line"><span class="keyword">if</span> destinationViewController <span class="keyword">is</span> planInfoViewController <span class="decorator">&#123;...&#125;</span> //如果 <span class="literal">true</span> 那么就可以进行 <span class="keyword">as</span> 操作了</span><br></pre></td></tr></table></figure>
+<p>我更喜欢第一种，检查与转换一次搞定。</p>
+
+        
+      
+    </div>
+
+    <div class="post-footer">
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </div>
+  </div>
+
+
+    
+      
+
+  <div class="post post-type-normal ">
+    <div class="post-header">
+
+      
+      
+        <h1 class="post-title">
+          
+          
+            
+              <a class="post-title-link" href="/2015/07/17/ios-notes-synthesize/">
                 iOS 学习笔记 — @synthesize合成指令
               </a>
             
@@ -163,8 +375,8 @@
           
             <span class="post-comments-count">
             &nbsp; | &nbsp;
-            <a href="/2015/07/17/notes-synthesize/#comments" >
-              <span class="post-comments-count disqus-comment-count" data-disqus-identifier="2015/07/17/notes-synthesize/"></span>
+            <a href="/2015/07/17/ios-notes-synthesize/#comments" >
+              <span class="post-comments-count disqus-comment-count" data-disqus-identifier="2015/07/17/ios-notes-synthesize/"></span>
             </a>
           </span>
           
@@ -191,6 +403,7 @@
 <p><a href="https://developer.apple.com/library/mac/documentation/Cocoa/Conceptual/ProgrammingWithObjectiveC/EncapsulatingData/EncapsulatingData.html#//apple_ref/doc/uid/TP40011210-CH5-SW1" target="_blank" rel="external">Programming with Objective-C</a></p>
 <p><a href="http://stackoverflow.com/questions/3266467/what-exactly-does-synthesize-do" target="_blank" rel="external">What exactly does @synthesize do?</a></p>
 <p><a href="http://stackoverflow.com/questions/15606151/objective-c-is-synthesize-required-or-optional" target="_blank" rel="external">Objective-C is @synthesize required or optional?</a></p>
+<p><a href="http://stackoverflow.com/questions/9368676/under-what-conditions-is-synthesize-automatic-in-objective-c/11767553#11767553" target="_blank" rel="external">Under what conditions is @synthesize automatic in Objective-c?</a></p>
 
         
       
@@ -634,7 +847,7 @@
         <div class="site-state motion-element">
           <div class="site-state-item site-state-posts">
             <a href="/archives">
-              <span class="site-state-item-count">5</span>
+              <span class="site-state-item-count">7</span>
               <span class="site-state-item-name">posts</span>
             </a>
           </div>

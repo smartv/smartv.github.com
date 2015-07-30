@@ -24,7 +24,7 @@
 
 
 
-  <meta name="keywords" content="frontend," />
+  <meta name="keywords" content="iOS," />
 
 
 
@@ -47,7 +47,7 @@
 
 
 
-  <title> postName // Be smart and make thins done </title>
+  <title> iOS 学习笔记 — @synthesize合成指令 // Be smart and make thins done </title>
 </head>
 
 <body>
@@ -142,7 +142,7 @@
           
           
             
-              postName
+              iOS 学习笔记 — @synthesize合成指令
             
           
         </h1>
@@ -150,28 +150,17 @@
 
       <div class="post-meta">
         <span class="post-time">
-          Posted on 2013-12-02
+          Posted on 2015-07-17
         </span>
 
-        
-          <span class="post-category">
-            &nbsp; | &nbsp; In
-            
-              <a href="/categories/iOS/">iOS</a>
-
-              
-              
-
-            
-          </span>
         
 
         
           
             <span class="post-comments-count">
             &nbsp; | &nbsp;
-            <a href="/2013/12/02/hexo mac osx tutorial/#comments" >
-              <span class="post-comments-count disqus-comment-count" data-disqus-identifier="2013/12/02/hexo mac osx tutorial/"></span>
+            <a href="/2015/07/17/ios-notes-synthesize/#comments" >
+              <span class="post-comments-count disqus-comment-count" data-disqus-identifier="2015/07/17/ios-notes-synthesize/"></span>
             </a>
           </span>
           
@@ -185,28 +174,19 @@
       
 
       
-        <h1 id="安装过程">安装过程</h1><ul>
-<li><p>github 账号</p>
-</li>
-<li><p>Homebrew 安装</p>
-</li>
-<li><p>brew install node</p>
-</li>
-<li><p>npm install hexo -g</p>
-</li>
-<li><p>hexo init [folder]</p>
-</li>
-<li><p>npm install hexo-server —save</p>
-</li>
-<li><p>npm install</p>
-</li>
-<li><p>npm install hexo-deployer-git —save</p>
-</li>
-<li><p>hexo deploy</p>
-<p>​</p>
-<p>​</p>
-</li>
-</ul>
+        <p>许多编程语言中，在程序员编写一个<code>@property</code>时候，编译器为了减轻程序员的工作量都会自动给<code>@property</code>自动生成两个以下划线开头的成员变量，就跟下面一样。</p>
+<figure class="highlight css"><table><tr><td class="code"><pre><span class="line"><span class="at_rule">@<span class="keyword">property</span> NSString *firstName</span>;</span><br></pre></td></tr></table></figure>
+<p>因此 Xcode 4.4的以前的版本给程序员提供了 <code>@sythesize</code> 关键字来生成下划线开头的成员变量，每当声明一个属性之后都必须用 <code>@sythesize</code> 在 <code>implementation</code> 里面告诉编译器，编译器才会给生成下划线开头的成员变量方法。下面代码做个演示。</p>
+<figure class="highlight objectivec"><table><tr><td class="code"><pre><span class="line"><span class="keyword">@property</span> (<span class="keyword">nonatomic</span>,<span class="keyword">strong</span>) <span class="built_in">NSString</span> *someProperty;<span class="comment">//声明一个变量</span></span><br><span class="line"></span><br><span class="line">@sythesize someProperty = _someProperty； <span class="comment">// 必须使用 合成指令告诉编译器，其才会生成该属性需要的成员变量。</span></span><br></pre></td></tr></table></figure>
+<p> 因为这样，Xcode 4.4以前版本的程序员做开发比较郁闷的时候，就是需要声明很多属性的时候就会出现一堆 <code>@sythesize</code> 。之后，苹果发现这个问题之后呢，在 Xcode 4.5以后的版本对其进行改进，不再需要程序员手动去调用 <code>@sythesize</code> 指令也可以自动生成带下划线的成员变量了。</p>
+<figure class="highlight objectivec"><table><tr><td class="code"><pre><span class="line"><span class="class"><span class="keyword">@interface</span> <span class="title">parentViewController</span>（）</span></span><br><span class="line"><span class="keyword">@property</span> (<span class="keyword">nonatomic</span>,<span class="keyword">strong</span>) <span class="built_in">NSString</span> *someProperty; <span class="comment">//父类的属性</span></span><br><span class="line"><span class="keyword">@end</span></span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">@implementation</span> <span class="title">childViewController</span></span></span><br><span class="line">@sythesize someProperty = _someProperty；</span><br><span class="line">@(<span class="keyword">void</span>)someMethod</span><br><span class="line">&#123;</span><br><span class="line">	 <span class="keyword">self</span><span class="variable">.someProperty</span> <span class="comment">//循环引用..</span></span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">@end</span></span><br></pre></td></tr></table></figure>
+<p>这么一来简化了程序员的工作量，但是当成员变量出现在父类的情况下，子类如果需要调用父类的成员变量时，编译器不会给子类也生成相应的下划线成员变量。Xcode 则推荐我们使用<code>self</code>关键字。但是通过 <code>self.someProperty</code> 调用父类的成员变量时候，是调用属性的 <code>getter</code> 方法，<code>getter</code>  调用时候再 <code>getter</code> 自己的时候就会形成循环引用的问题。</p>
+<p>明白了这个之后，往后在子类调用父类的变量时候，手动调用一下 <code>@sythesize</code> 就可以了。</p>
+<p>参考：</p>
+<p><a href="https://developer.apple.com/library/mac/documentation/Cocoa/Conceptual/ProgrammingWithObjectiveC/EncapsulatingData/EncapsulatingData.html#//apple_ref/doc/uid/TP40011210-CH5-SW1" target="_blank" rel="external">Programming with Objective-C</a></p>
+<p><a href="http://stackoverflow.com/questions/3266467/what-exactly-does-synthesize-do" target="_blank" rel="external">What exactly does @synthesize do?</a></p>
+<p><a href="http://stackoverflow.com/questions/15606151/objective-c-is-synthesize-required-or-optional" target="_blank" rel="external">Objective-C is @synthesize required or optional?</a></p>
+<p><a href="http://stackoverflow.com/questions/9368676/under-what-conditions-is-synthesize-automatic-in-objective-c/11767553#11767553" target="_blank" rel="external">Under what conditions is @synthesize automatic in Objective-c?</a></p>
 
       
     </div>
@@ -215,7 +195,7 @@
       
         <div class="post-tags">
           
-            <a href="/tags/frontend/"> #frontend </a>
+            <a href="/tags/iOS/"> #iOS </a>
           
         </div>
       
@@ -224,13 +204,13 @@
         <div class="post-nav">
           <div class="post-nav-prev post-nav-item">
             
-              <a href="/2015/07/09/My-New-Post/">My New Post</a>
+              <a href="/2015/07/30/Swift-what-is-the-AnyObject/">Swift: 什么是 AnyObject</a>
             
           </div>
 
           <div class="post-nav-next post-nav-item">
             
-              <a href="/2013/12/02/hello-world/">postName</a>
+              <a href="/2015/07/09/My-New-Post/">My New Post</a>
             
           </div>
         </div>
@@ -358,7 +338,7 @@
           <div class="post-toc">
             
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#安装过程"><span class="nav-number">1.</span> <span class="nav-text">安装过程</span></a></li></ol></div>
+              <p class="post-toc-empty">This post does not have a Table Of Contents</p>
             
           </div>
           <div class="post-toc-indicator-bottom post-toc-indicator"></div>
@@ -583,9 +563,9 @@
 
     <script type="text/javascript">
       var disqus_shortname = 'smartv';
-      var disqus_identifier = '2013/12/02/hexo mac osx tutorial/';
-      var disqus_title = 'postName';
-      var disqus_url = 'http://yoursite.com/2013/12/02/hexo mac osx tutorial/';
+      var disqus_identifier = '2015/07/17/ios-notes-synthesize/';
+      var disqus_title = 'iOS 学习笔记 — @synthesize合成指令';
+      var disqus_url = 'http://yoursite.com/2015/07/17/ios-notes-synthesize/';
 
       function run_disqus_script(disqus_script){
         var dsq = document.createElement('script');
