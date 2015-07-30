@@ -144,126 +144,6 @@
           
           
             
-              <a class="post-title-link" href="/2015/07/30/ios-notes-media-player/">
-                ios notes media play
-              </a>
-            
-          
-        </h1>
-      
-
-      <div class="post-meta">
-        <span class="post-time">
-          Posted on 2015-07-30
-        </span>
-
-        
-          <span class="post-category">
-            &nbsp; | &nbsp; In
-            
-              <a href="/categories/iOS/">iOS</a>
-
-              
-              
-
-            
-          </span>
-        
-
-        
-          
-            <span class="post-comments-count">
-            &nbsp; | &nbsp;
-            <a href="/2015/07/30/ios-notes-media-player/#comments" >
-              <span class="post-comments-count disqus-comment-count" data-disqus-identifier="2015/07/30/ios-notes-media-player/"></span>
-            </a>
-          </span>
-          
-        
-      </div>
-    </div>
-
-    <div class="post-body">
-
-      
-      
-
-      
-        
-          <h2 id="iOS学习笔记之——媒体播放">iOS学习笔记之——媒体播放</h2><p>在iOS中提供了两种播放媒体的两个类:<code>MPMoviePlayerController</code>和<code>MPMoviePlayerViewController</code>，让我们可以轻松地播放媒体文件。其中<code>MPMoviePlayerViewController</code> 只能全屏播放，下面我们就来动手试一试吧。</p>
-<h5 id="（一）导入依赖项">（一）导入依赖项</h5><p>在写代码之前我们需要引入一个依赖项到XCode：<code>MediaPlayer.Framework</code>。<br>图片。。。。<br><code>MPMoviePlayerController</code>内部有个view用来展示视频内容，添加其他<code>Controller</code>的View上面就可实现播放。目前支持的视频格式有<code>H.264</code>和<code>MPEG-4 Part 2 video</code>两种。支持的文件扩展名为：avi、mkv、mov、m4v、mp4等。可以到苹果官网下载一些用来测试的小<a href="http
-://support.apple.com/kb/ht1424">视频文件</a>。沙盒里面取视频文件</p>
-<h5 id="（二）动手写代码">（二）动手写代码</h5><p>新建一个<code>Controller</code>将头文件导入。</p>
-<pre><code><span class="id">#import</span> <span class="string">"MainViewController.h"</span>
-<span class="id">#import</span> &lt;MediaPlayer/MediaPlayer.h&gt;
-</code></pre><p>声明一个属性</p>
-<pre><code><span class="variable">@interface</span> MainViewController ()
-<span class="variable">@property</span> (strong, nonatomic) MPMoviePlayerController *player;<span class="comment">//注意：如果定义在viewDidLoad中的话将会无法播放、因为出了`viewDidLoad`之后*player会被销毁掉了。</span>
-<span class="variable">@property</span> (strong, nonatomic) UIImageView *imageView;
-<span class="variable">@end</span>
-</code></pre><p>接下来在<code>viewDidLoad</code>里面初始化视频播放器并添加到<code>RootViewController</code></p>
-<pre><code><span class="built_in">NSURL</span> *url = [[<span class="built_in">NSBundle</span> mainBundle]URLForResource:<span class="string">@"promo_full"</span> withExtension:<span class="string">@"mp4"</span>];
- <span class="keyword">self</span><span class="variable">.player</span> = [[<span class="built_in">MPMoviePlayerController</span> alloc]initWithContentURL:url];
- [<span class="keyword">self</span><span class="variable">.player</span><span class="variable">.view</span> setFrame:<span class="built_in">CGRectMake</span>(<span class="number">0</span>, <span class="number">0</span>, <span class="number">320</span>, <span class="number">180</span>)];   <span class="comment">//16:9比例</span>
- [<span class="keyword">self</span><span class="variable">.view</span> addSubview:<span class="keyword">self</span><span class="variable">.player</span><span class="variable">.view</span>];
- [<span class="keyword">self</span><span class="variable">.player</span> play];
-</code></pre><p>到目前为止我们就可以实现播放视频了。是不是很简单？<br>图片。。。</p>
-<h5 id="（三）思考">（三）思考</h5><p>通常我们使用主流的播放器一般都会有记录上次播放位置、视频页面截图、视频结束弹出广告，如何实现呢。这就需要通过通知中心，以观察者模式监视视频模仿的状态了,下面是一个播放时全屏的例子。</p>
-<pre><code>[[NSNotificationCenter <span class="keyword">default</span>Center]addObserver:<span class="literal">self</span> selector:@selector(<span class="keyword">state</span>Listener) name:MPMoviePlayerPlaybackStateDidChangeNotification object:nil];
-</code></pre><p>接着我们需要写一个监听方法在视频播放的时候<code>MPMoviePlaybackStatePlaying</code>来设置<code>Fullscreen</code>就可以了</p>
-<pre><code>- (<span class="keyword">void</span>)stateListener
-{
-    <span class="keyword">if</span> (<span class="keyword">self</span><span class="variable">.player</span><span class="variable">.playbackState</span>==<span class="built_in">MPMoviePlaybackStatePlaying</span>) {
-            [<span class="keyword">self</span><span class="variable">.player</span> setFullscreen:<span class="literal">YES</span> animated:<span class="literal">YES</span>];    <span class="comment">// 设置全屏播放</span>
-            <span class="built_in">NSLog</span>(<span class="string">@"播放"</span>);
-    }
-}
-<span class="keyword">@end</span>
-</code></pre><p>接下来我们再来实现一个视频截图的功能，首先我们需要准备一个<code>UIImageView</code>加到<code>RootViewController</code>里面来显示我们的截图。</p>
-<pre><code> [[<span class="built_in">NSNotificationCenter</span> defaultCenter]addObserver:<span class="keyword">self</span> selector:<span class="keyword">@selector</span>(caputerImage:) name:<span class="built_in">MPMoviePlayerThumbnailImageRequestDidFinishNotification</span> object:<span class="literal">nil</span>]; 
-
-[<span class="keyword">self</span><span class="variable">.player</span> requestThumbnailImagesAtTimes:@[@<span class="number">10.0</span>f, @<span class="number">20.0</span>f] timeOption:<span class="built_in">MPMovieTimeOptionNearestKeyFrame</span>]; <span class="comment">//指定一个截图时间区间</span>
-<span class="built_in">UIImageView</span> *thumbnailImageView = [[<span class="built_in">UIImageView</span> alloc]initWithFrame:<span class="built_in">CGRectMake</span>(<span class="number">80</span>, <span class="number">200</span>, <span class="number">160</span>, <span class="number">90</span>)];
-<span class="keyword">self</span><span class="variable">.imageView</span> = thumbnailImageView;
-[<span class="keyword">self</span><span class="variable">.view</span> addSubview:thumbnailImageView];
-</code></pre><p>接下来同样需要一个监听方法来完成截图功能。</p>
-<pre><code>- (<span class="keyword">void</span>)caputerImage:(<span class="built_in">NSNotification</span> *)notification
-{
-    <span class="built_in">NSLog</span>(<span class="string">@"截图 %@"</span>, notification);
-    <span class="built_in">UIImage</span> *image = notification<span class="variable">.userInfo</span>[<span class="string">@"MPMoviePlayerThumbnailImageKey"</span>];
-    [<span class="keyword">self</span><span class="variable">.imageView</span> setImage:image];
-}
-</code></pre><h4 id="总结">总结</h4><p>基于苹果给我们封装了很多细节，我们可以很轻松的实现很多常用的功能。还有<code>MPMoviePlayerViewController</code>大体功能差不多就不一一介绍了。</p>
-
-        
-      
-    </div>
-
-    <div class="post-footer">
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </div>
-  </div>
-
-
-    
-      
-
-  <div class="post post-type-normal ">
-    <div class="post-header">
-
-      
-      
-        <h1 class="post-title">
-          
-          
-            
               <a class="post-title-link" href="/2015/07/30/Swift-what-is-the-AnyObject/">
                 Swift: 什么是 AnyObject
               </a>
@@ -326,84 +206,6 @@
 <p>or</p>
 <figure class="highlight nimrod"><table><tr><td class="code"><pre><span class="line"><span class="keyword">if</span> destinationViewController <span class="keyword">is</span> planInfoViewController <span class="decorator">&#123;...&#125;</span> //如果 <span class="literal">true</span> 那么就可以进行 <span class="keyword">as</span> 操作了</span><br></pre></td></tr></table></figure>
 <p>我更喜欢第一种，检查与转换一次搞定。</p>
-
-        
-      
-    </div>
-
-    <div class="post-footer">
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </div>
-  </div>
-
-
-    
-      
-
-  <div class="post post-type-normal ">
-    <div class="post-header">
-
-      
-      
-        <h1 class="post-title">
-          
-          
-            
-              <a class="post-title-link" href="/2015/07/17/ios-notes-synthesize/">
-                iOS 学习笔记 — @synthesize合成指令
-              </a>
-            
-          
-        </h1>
-      
-
-      <div class="post-meta">
-        <span class="post-time">
-          Posted on 2015-07-17
-        </span>
-
-        
-
-        
-          
-            <span class="post-comments-count">
-            &nbsp; | &nbsp;
-            <a href="/2015/07/17/ios-notes-synthesize/#comments" >
-              <span class="post-comments-count disqus-comment-count" data-disqus-identifier="2015/07/17/ios-notes-synthesize/"></span>
-            </a>
-          </span>
-          
-        
-      </div>
-    </div>
-
-    <div class="post-body">
-
-      
-      
-
-      
-        
-          <p>许多编程语言中，在程序员编写一个<code>@property</code>时候，编译器为了减轻程序员的工作量都会自动给<code>@property</code>自动生成两个以下划线开头的成员变量，就跟下面一样。</p>
-<figure class="highlight css"><table><tr><td class="code"><pre><span class="line"><span class="at_rule">@<span class="keyword">property</span> NSString *firstName</span>;</span><br></pre></td></tr></table></figure>
-<p>因此 Xcode 4.4的以前的版本给程序员提供了 <code>@sythesize</code> 关键字来生成下划线开头的成员变量，每当声明一个属性之后都必须用 <code>@sythesize</code> 在 <code>implementation</code> 里面告诉编译器，编译器才会给生成下划线开头的成员变量方法。下面代码做个演示。</p>
-<figure class="highlight objectivec"><table><tr><td class="code"><pre><span class="line"><span class="keyword">@property</span> (<span class="keyword">nonatomic</span>,<span class="keyword">strong</span>) <span class="built_in">NSString</span> *someProperty;<span class="comment">//声明一个变量</span></span><br><span class="line"></span><br><span class="line">@sythesize someProperty = _someProperty； <span class="comment">// 必须使用 合成指令告诉编译器，其才会生成该属性需要的成员变量。</span></span><br></pre></td></tr></table></figure>
-<p> 因为这样，Xcode 4.4以前版本的程序员做开发比较郁闷的时候，就是需要声明很多属性的时候就会出现一堆 <code>@sythesize</code> 。之后，苹果发现这个问题之后呢，在 Xcode 4.5以后的版本对其进行改进，不再需要程序员手动去调用 <code>@sythesize</code> 指令也可以自动生成带下划线的成员变量了。</p>
-<figure class="highlight objectivec"><table><tr><td class="code"><pre><span class="line"><span class="class"><span class="keyword">@interface</span> <span class="title">parentViewController</span>（）</span></span><br><span class="line"><span class="keyword">@property</span> (<span class="keyword">nonatomic</span>,<span class="keyword">strong</span>) <span class="built_in">NSString</span> *someProperty; <span class="comment">//父类的属性</span></span><br><span class="line"><span class="keyword">@end</span></span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">@implementation</span> <span class="title">childViewController</span></span></span><br><span class="line">@sythesize someProperty = _someProperty；</span><br><span class="line">@(<span class="keyword">void</span>)someMethod</span><br><span class="line">&#123;</span><br><span class="line">	 <span class="keyword">self</span><span class="variable">.someProperty</span> <span class="comment">//循环引用..</span></span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">@end</span></span><br></pre></td></tr></table></figure>
-<p>这么一来简化了程序员的工作量，但是当成员变量出现在父类的情况下，子类如果需要调用父类的成员变量时，编译器不会给子类也生成相应的下划线成员变量。Xcode 则推荐我们使用<code>self</code>关键字。但是通过 <code>self.someProperty</code> 调用父类的成员变量时候，是调用属性的 <code>getter</code> 方法，<code>getter</code>  调用时候再 <code>getter</code> 自己的时候就会形成循环引用的问题。</p>
-<p>明白了这个之后，往后在子类调用父类的变量时候，手动调用一下 <code>@sythesize</code> 就可以了。</p>
-<p>参考：</p>
-<p><a href="https://developer.apple.com/library/mac/documentation/Cocoa/Conceptual/ProgrammingWithObjectiveC/EncapsulatingData/EncapsulatingData.html#//apple_ref/doc/uid/TP40011210-CH5-SW1" target="_blank" rel="external">Programming with Objective-C</a></p>
-<p><a href="http://stackoverflow.com/questions/3266467/what-exactly-does-synthesize-do" target="_blank" rel="external">What exactly does @synthesize do?</a></p>
-<p><a href="http://stackoverflow.com/questions/15606151/objective-c-is-synthesize-required-or-optional" target="_blank" rel="external">Objective-C is @synthesize required or optional?</a></p>
-<p><a href="http://stackoverflow.com/questions/9368676/under-what-conditions-is-synthesize-automatic-in-objective-c/11767553#11767553" target="_blank" rel="external">Under what conditions is @synthesize automatic in Objective-c?</a></p>
 
         
       
@@ -795,6 +597,204 @@
 // <span class="number">3</span>.如果<span class="keyword">block</span>存储于栈空间，不会对<span class="keyword">block</span>内部所用到的对象产生强引用
 // <span class="number">4</span>.如果<span class="keyword">block</span>存储于堆空间，就会对<span class="keyword">block</span>内部所用到的对象产生强引用
 </code></pre>
+        
+      
+    </div>
+
+    <div class="post-footer">
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </div>
+  </div>
+
+
+    
+      
+
+  <div class="post post-type-normal ">
+    <div class="post-header">
+
+      
+      
+        <h1 class="post-title">
+          
+          
+            
+              <a class="post-title-link" href="/2013/07/30/ios-notes-media-player/">
+                iOS 学习笔记 —— 媒体播放
+              </a>
+            
+          
+        </h1>
+      
+
+      <div class="post-meta">
+        <span class="post-time">
+          Posted on 2013-07-30
+        </span>
+
+        
+          <span class="post-category">
+            &nbsp; | &nbsp; In
+            
+              <a href="/categories/iOS/">iOS</a>
+
+              
+              
+
+            
+          </span>
+        
+
+        
+          
+            <span class="post-comments-count">
+            &nbsp; | &nbsp;
+            <a href="/2013/07/30/ios-notes-media-player/#comments" >
+              <span class="post-comments-count disqus-comment-count" data-disqus-identifier="2013/07/30/ios-notes-media-player/"></span>
+            </a>
+          </span>
+          
+        
+      </div>
+    </div>
+
+    <div class="post-body">
+
+      
+      
+
+      
+        
+          <h2 id="iOS学习笔记之——媒体播放">iOS学习笔记之——媒体播放</h2><p>在iOS中提供了两种播放媒体的两个类:<code>MPMoviePlayerController</code>和<code>MPMoviePlayerViewController</code>，让我们可以轻松地播放媒体文件。其中<code>MPMoviePlayerViewController</code> 只能全屏播放，下面我们就来动手试一试吧。</p>
+<h5 id="（一）导入依赖项">（一）导入依赖项</h5><p>在写代码之前我们需要引入一个依赖项到XCode：<code>MediaPlayer.Framework</code>。<br>图片。。。。<br><code>MPMoviePlayerController</code>内部有个view用来展示视频内容，添加其他<code>Controller</code>的View上面就可实现播放。目前支持的视频格式有<code>H.264</code>和<code>MPEG-4 Part 2 video</code>两种。支持的文件扩展名为：avi、mkv、mov、m4v、mp4等。可以到苹果官网下载一些用来测试的小<a href="http
+://support.apple.com/kb/ht1424">视频文件</a>。沙盒里面取视频文件</p>
+<h5 id="（二）动手写代码">（二）动手写代码</h5><p>新建一个<code>Controller</code>将头文件导入。</p>
+<pre><code><span class="id">#import</span> <span class="string">"MainViewController.h"</span>
+<span class="id">#import</span> &lt;MediaPlayer/MediaPlayer.h&gt;
+</code></pre><p>声明一个属性</p>
+<pre><code><span class="variable">@interface</span> MainViewController ()
+<span class="variable">@property</span> (strong, nonatomic) MPMoviePlayerController *player;<span class="comment">//注意：如果定义在viewDidLoad中的话将会无法播放、因为出了`viewDidLoad`之后*player会被销毁掉了。</span>
+<span class="variable">@property</span> (strong, nonatomic) UIImageView *imageView;
+<span class="variable">@end</span>
+</code></pre><p>接下来在<code>viewDidLoad</code>里面初始化视频播放器并添加到<code>RootViewController</code></p>
+<pre><code><span class="built_in">NSURL</span> *url = [[<span class="built_in">NSBundle</span> mainBundle]URLForResource:<span class="string">@"promo_full"</span> withExtension:<span class="string">@"mp4"</span>];
+ <span class="keyword">self</span><span class="variable">.player</span> = [[<span class="built_in">MPMoviePlayerController</span> alloc]initWithContentURL:url];
+ [<span class="keyword">self</span><span class="variable">.player</span><span class="variable">.view</span> setFrame:<span class="built_in">CGRectMake</span>(<span class="number">0</span>, <span class="number">0</span>, <span class="number">320</span>, <span class="number">180</span>)];   <span class="comment">//16:9比例</span>
+ [<span class="keyword">self</span><span class="variable">.view</span> addSubview:<span class="keyword">self</span><span class="variable">.player</span><span class="variable">.view</span>];
+ [<span class="keyword">self</span><span class="variable">.player</span> play];
+</code></pre><p>到目前为止我们就可以实现播放视频了。是不是很简单？<br>图片。。。</p>
+<h5 id="（三）思考">（三）思考</h5><p>通常我们使用主流的播放器一般都会有记录上次播放位置、视频页面截图、视频结束弹出广告，如何实现呢。这就需要通过通知中心，以观察者模式监视视频模仿的状态了,下面是一个播放时全屏的例子。</p>
+<pre><code>[[NSNotificationCenter <span class="keyword">default</span>Center]addObserver:<span class="literal">self</span> selector:@selector(<span class="keyword">state</span>Listener) name:MPMoviePlayerPlaybackStateDidChangeNotification object:nil];
+</code></pre><p>接着我们需要写一个监听方法在视频播放的时候<code>MPMoviePlaybackStatePlaying</code>来设置<code>Fullscreen</code>就可以了</p>
+<pre><code>- (<span class="keyword">void</span>)stateListener
+{
+    <span class="keyword">if</span> (<span class="keyword">self</span><span class="variable">.player</span><span class="variable">.playbackState</span>==<span class="built_in">MPMoviePlaybackStatePlaying</span>) {
+            [<span class="keyword">self</span><span class="variable">.player</span> setFullscreen:<span class="literal">YES</span> animated:<span class="literal">YES</span>];    <span class="comment">// 设置全屏播放</span>
+            <span class="built_in">NSLog</span>(<span class="string">@"播放"</span>);
+    }
+}
+<span class="keyword">@end</span>
+</code></pre><p>接下来我们再来实现一个视频截图的功能，首先我们需要准备一个<code>UIImageView</code>加到<code>RootViewController</code>里面来显示我们的截图。</p>
+<pre><code> [[<span class="built_in">NSNotificationCenter</span> defaultCenter]addObserver:<span class="keyword">self</span> selector:<span class="keyword">@selector</span>(caputerImage:) name:<span class="built_in">MPMoviePlayerThumbnailImageRequestDidFinishNotification</span> object:<span class="literal">nil</span>]; 
+
+[<span class="keyword">self</span><span class="variable">.player</span> requestThumbnailImagesAtTimes:@[@<span class="number">10.0</span>f, @<span class="number">20.0</span>f] timeOption:<span class="built_in">MPMovieTimeOptionNearestKeyFrame</span>]; <span class="comment">//指定一个截图时间区间</span>
+<span class="built_in">UIImageView</span> *thumbnailImageView = [[<span class="built_in">UIImageView</span> alloc]initWithFrame:<span class="built_in">CGRectMake</span>(<span class="number">80</span>, <span class="number">200</span>, <span class="number">160</span>, <span class="number">90</span>)];
+<span class="keyword">self</span><span class="variable">.imageView</span> = thumbnailImageView;
+[<span class="keyword">self</span><span class="variable">.view</span> addSubview:thumbnailImageView];
+</code></pre><p>接下来同样需要一个监听方法来完成截图功能。</p>
+<pre><code>- (<span class="keyword">void</span>)caputerImage:(<span class="built_in">NSNotification</span> *)notification
+{
+    <span class="built_in">NSLog</span>(<span class="string">@"截图 %@"</span>, notification);
+    <span class="built_in">UIImage</span> *image = notification<span class="variable">.userInfo</span>[<span class="string">@"MPMoviePlayerThumbnailImageKey"</span>];
+    [<span class="keyword">self</span><span class="variable">.imageView</span> setImage:image];
+}
+</code></pre><h4 id="总结">总结</h4><p>基于苹果给我们封装了很多细节，我们可以很轻松的实现很多常用的功能。还有<code>MPMoviePlayerViewController</code>大体功能差不多就不一一介绍了。</p>
+
+        
+      
+    </div>
+
+    <div class="post-footer">
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </div>
+  </div>
+
+
+    
+      
+
+  <div class="post post-type-normal ">
+    <div class="post-header">
+
+      
+      
+        <h1 class="post-title">
+          
+          
+            
+              <a class="post-title-link" href="/2013/07/17/ios-notes-synthesize/">
+                iOS 学习笔记 — @synthesize合成指令
+              </a>
+            
+          
+        </h1>
+      
+
+      <div class="post-meta">
+        <span class="post-time">
+          Posted on 2013-07-17
+        </span>
+
+        
+
+        
+          
+            <span class="post-comments-count">
+            &nbsp; | &nbsp;
+            <a href="/2013/07/17/ios-notes-synthesize/#comments" >
+              <span class="post-comments-count disqus-comment-count" data-disqus-identifier="2013/07/17/ios-notes-synthesize/"></span>
+            </a>
+          </span>
+          
+        
+      </div>
+    </div>
+
+    <div class="post-body">
+
+      
+      
+
+      
+        
+          <p>许多编程语言中，在程序员编写一个<code>@property</code>时候，编译器为了减轻程序员的工作量都会自动给<code>@property</code>自动生成两个以下划线开头的成员变量，就跟下面一样。</p>
+<figure class="highlight css"><table><tr><td class="code"><pre><span class="line"><span class="at_rule">@<span class="keyword">property</span> NSString *firstName</span>;</span><br></pre></td></tr></table></figure>
+<p>因此 Xcode 4.4的以前的版本给程序员提供了 <code>@sythesize</code> 关键字来生成下划线开头的成员变量，每当声明一个属性之后都必须用 <code>@sythesize</code> 在 <code>implementation</code> 里面告诉编译器，编译器才会给生成下划线开头的成员变量方法。下面代码做个演示。</p>
+<figure class="highlight objectivec"><table><tr><td class="code"><pre><span class="line"><span class="keyword">@property</span> (<span class="keyword">nonatomic</span>,<span class="keyword">strong</span>) <span class="built_in">NSString</span> *someProperty;<span class="comment">//声明一个变量</span></span><br><span class="line"></span><br><span class="line">@sythesize someProperty = _someProperty； <span class="comment">// 必须使用 合成指令告诉编译器，其才会生成该属性需要的成员变量。</span></span><br></pre></td></tr></table></figure>
+<p> 因为这样，Xcode 4.4以前版本的程序员做开发比较郁闷的时候，就是需要声明很多属性的时候就会出现一堆 <code>@sythesize</code> 。之后，苹果发现这个问题之后呢，在 Xcode 4.5以后的版本对其进行改进，不再需要程序员手动去调用 <code>@sythesize</code> 指令也可以自动生成带下划线的成员变量了。</p>
+<figure class="highlight objectivec"><table><tr><td class="code"><pre><span class="line"><span class="class"><span class="keyword">@interface</span> <span class="title">parentViewController</span>（）</span></span><br><span class="line"><span class="keyword">@property</span> (<span class="keyword">nonatomic</span>,<span class="keyword">strong</span>) <span class="built_in">NSString</span> *someProperty; <span class="comment">//父类的属性</span></span><br><span class="line"><span class="keyword">@end</span></span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">@implementation</span> <span class="title">childViewController</span></span></span><br><span class="line">@sythesize someProperty = _someProperty；</span><br><span class="line">@(<span class="keyword">void</span>)someMethod</span><br><span class="line">&#123;</span><br><span class="line">	 <span class="keyword">self</span><span class="variable">.someProperty</span> <span class="comment">//循环引用..</span></span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">@end</span></span><br></pre></td></tr></table></figure>
+<p>这么一来简化了程序员的工作量，但是当成员变量出现在父类的情况下，子类如果需要调用父类的成员变量时，编译器不会给子类也生成相应的下划线成员变量。Xcode 则推荐我们使用<code>self</code>关键字。但是通过 <code>self.someProperty</code> 调用父类的成员变量时候，是调用属性的 <code>getter</code> 方法，<code>getter</code>  调用时候再 <code>getter</code> 自己的时候就会形成循环引用的问题。</p>
+<p>明白了这个之后，往后在子类调用父类的变量时候，手动调用一下 <code>@sythesize</code> 就可以了。</p>
+<p>参考：</p>
+<p><a href="https://developer.apple.com/library/mac/documentation/Cocoa/Conceptual/ProgrammingWithObjectiveC/EncapsulatingData/EncapsulatingData.html#//apple_ref/doc/uid/TP40011210-CH5-SW1" target="_blank" rel="external">Programming with Objective-C</a></p>
+<p><a href="http://stackoverflow.com/questions/3266467/what-exactly-does-synthesize-do" target="_blank" rel="external">What exactly does @synthesize do?</a></p>
+<p><a href="http://stackoverflow.com/questions/15606151/objective-c-is-synthesize-required-or-optional" target="_blank" rel="external">Objective-C is @synthesize required or optional?</a></p>
+<p><a href="http://stackoverflow.com/questions/9368676/under-what-conditions-is-synthesize-automatic-in-objective-c/11767553#11767553" target="_blank" rel="external">Under what conditions is @synthesize automatic in Objective-c?</a></p>
+
         
       
     </div>
