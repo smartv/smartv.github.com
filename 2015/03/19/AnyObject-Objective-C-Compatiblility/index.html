@@ -47,7 +47,7 @@
 
 
 
-  <title> Swift: 什么是 AnyObject // Be smart and make thins done </title>
+  <title> AnyObject: 与 Objective-C 兼容 // Be smart and make thins done </title>
 </head>
 
 <body>
@@ -142,7 +142,7 @@
           
           
             
-              Swift: 什么是 AnyObject
+              AnyObject: 与 Objective-C 兼容
             
           
         </h1>
@@ -150,7 +150,7 @@
 
       <div class="post-meta">
         <span class="post-time">
-          Posted on 2015-07-30
+          Posted on 2015-03-19
         </span>
 
         
@@ -170,8 +170,8 @@
           
             <span class="post-comments-count">
             &nbsp; | &nbsp;
-            <a href="/2015/07/30/Swift-what-is-the-AnyObject/#comments" >
-              <span class="post-comments-count disqus-comment-count" data-disqus-identifier="2015/07/30/Swift-what-is-the-AnyObject/"></span>
+            <a href="/2015/03/19/AnyObject-Objective-C-Compatiblility/#comments" >
+              <span class="post-comments-count disqus-comment-count" data-disqus-identifier="2015/03/19/AnyObject-Objective-C-Compatiblility/"></span>
             </a>
           </span>
           
@@ -185,22 +185,21 @@
       
 
       
-        <h2 id="什么是AnyObjct">什么是AnyObjct</h2><p>为了方便理解你可以将 <code>AnyObject</code> 类比成一种类型，就像 <code>Array</code> 或 <code>Double</code> 一样，但事实上它并不是一种类型。它主要用于兼容现有的 Objective-c API 和 iOS 代码， <code>AnyObject</code> 可以用来构建自己的数据结构，但并不经常使用。这有点不像 Swift，因为 Swift 是强类型语言，并且有类型推断的特性。 <code>AnyObject</code> 是只想一个对象（未知类）的指针，这有点奇怪哈。</p>
-<h2 id="什么时候用到_AnyObject">什么时候用到 AnyObject</h2><p>有可能在变量中见到：</p>
-<figure class="highlight kotlin"><table><tr><td class="code"><pre><span class="line"><span class="variable"><span class="keyword">var</span> destinationViewController</span>: AnyObject</span><br><span class="line"><span class="variable"><span class="keyword">var</span> toolbarItems</span>: [AnyObject]</span><br></pre></td></tr></table></figure>
-<p>或者在方法参数中出现：</p>
-<figure class="highlight swift"><table><tr><td class="code"><pre><span class="line"><span class="func"><span class="keyword">func</span> <span class="title">prepareForSegue</span><span class="params">(segue: UIStoryboardSegue, sender: AnyObject)</span></span></span><br><span class="line"><span class="func"><span class="keyword">func</span> <span class="title">addConstraints</span><span class="params">(constrains: [AnyObject])</span></span></span><br><span class="line"><span class="func"><span class="keyword">func</span> <span class="title">appendString</span><span class="params">(sender: AnyObject)</span></span></span><br></pre></td></tr></table></figure>
-<p>甚至可以作为一个方法的返回值：</p>
-<figure class="highlight delphi"><table><tr><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="function"><span class="keyword">function</span> <span class="title">buttonWithType</span><span class="params">(buttonType: UIButtonType)</span> -&gt; <span class="title">AnyObject</span></span></span><br></pre></td></tr></table></figure>
-<p>在我们使用 Storyboard 进行连线时候出现：</p>
-<h2 id="如何使用_AnyObject">如何使用 AnyObject</h2><p>既然它是指针，我们就不可能发送任何消息给它。<code>为了使用它，我们要把它转换成一种我们已知的类型，这也是我们唯一使用它的方式</code> 例如：</p>
-<figure class="highlight cs"><table><tr><td class="code"><pre><span class="line"><span class="keyword">var</span> destinationViewController: AnyObject</span><br><span class="line"><span class="keyword">let</span> planVC = destinationViewController <span class="keyword">as</span> planInfoViewController</span><br></pre></td></tr></table></figure>
-<p>如果 dvc 为空，会 Crash</p>
-<p>安全转换有两种办法避免：</p>
-<figure class="highlight nimrod"><table><tr><td class="code"><pre><span class="line"><span class="keyword">if</span> <span class="keyword">let</span> planVC = destinationViewController <span class="keyword">as</span>? planInfoViewController <span class="decorator">&#123;...&#125;</span> // <span class="keyword">as</span>? 会返回一个 <span class="type">Optional</span> 版本</span><br></pre></td></tr></table></figure>
-<p>or</p>
-<figure class="highlight nimrod"><table><tr><td class="code"><pre><span class="line"><span class="keyword">if</span> destinationViewController <span class="keyword">is</span> planInfoViewController <span class="decorator">&#123;...&#125;</span> //如果 <span class="literal">true</span> 那么就可以进行 <span class="keyword">as</span> 操作了</span><br></pre></td></tr></table></figure>
-<p>我更喜欢第一种，检查与转换一次搞定。</p>
+        <p>众所周知，Objective-C 是 C 语言的超集，苹果借鉴了 Smalltalk 的面向对象和消息机制的思想对 C 语言进行了一套封装。既然是 C 语言的超集，那么在 Objective-C 环境执行C程序肯定没问题的。2014年 Swift 在 <a href="https://developer.apple.com/wwdc/" target="_blank" rel="external">Apple WWDC</a> 发布, 并且苹果大力推崇的情况下很有可能往后成为 iOS 平台上主流开发语言。但是现如今大部分公司和开发者还在使用 Objective-C 进行开发，为了更让开发者平稳过渡到 Swift 上的话，就肯定需要跟 Objective-C 兼容。</p>
+<p>苹果在兼容两个语言的时候遇上了很多麻烦，现在 Swift 也能使用原有的 Objective-C API，但是有一些特殊的数据类型在两种语言进行交接的时候</p>
+<pre><code><span class="built_in">NSString</span> 桥接成 String
+<span class="built_in">NSArray</span> 桥接成 Array&lt;AnyObject&gt;    
+<span class="built_in">NSDictionary</span> 桥接成 Dictionary&lt;<span class="built_in">NSObject</span>, AnyObject&gt;
+Int,Float,Double,Bool 桥接成 <span class="built_in">NSNumber</span>
+</code></pre><p>苹果神奇的将他们连接了起来，使得我们可以随意进行转换</p>
+<pre><code>let length = (someString as NSString)<span class="class">.length</span> <span class="comment">//length 是 NSSring 的方法</span>
+(someArray as NSSArray).<span class="function"><span class="title">componentJoinedByString</span><span class="params">(NSString)</span></span>
+</code></pre><p>Property List </p>
+<p>Propery List 不是一种类型，它属于一种工具类的东西，表面上是 AnyObject 但是背后里他是 NSString, NSArray, NSDictionary, NSNumber, NSData, NSDate 六种类型其中一种 或是桥接到 Swift 里的版本。</p>
+<p>为什么我们要用 Property List, 既然它是 AnyObject 我们使用起来就必须要 as 或 is 进行大量的类型转换。实际上主要原因有两个</p>
+<p>第一 用来隐式传递数据，类似于浏览器中的 Cookie，只有创建者才知道的如何解释的一组数据，只有创建者才知道 Property List 里面是 六种数据类型中的哪一种，对于其他人来说它们就是 AnyObject 但不知道具体是什么。其他人能做的就是把数据传送，提现了很好的封装性。</p>
+<p>第二 用于泛型数据结构，可以把一个数据结构变成一个泛型的数据结构。就好像 Enum 类型不是泛型，但是我们可以把它变成泛型的。</p>
+<p>还有一个好处就是 NSUserDefaults， 它只存储 Property List，通常用来存储用户数据、偏好设置什么的。由于它性能不高，不要用它来存储图片或者比较大的数据。由于它本身就是一个字典，我们可以像操作字典一样来操作它。</p>
 
       
     </div>
@@ -222,7 +221,7 @@
 
           <div class="post-nav-next post-nav-item">
             
-              <a href="/2013/10/17/block-theory-in-iOS/">iOS 中 Block 原理</a>
+              <a href="/2015/03/18/Swift-what-is-the-AnyObject/">Swift: 什么是 AnyObject</a>
             
           </div>
         </div>
@@ -290,21 +289,21 @@
         <div class="site-state motion-element">
           <div class="site-state-item site-state-posts">
             <a href="/archives">
-              <span class="site-state-item-count">4</span>
+              <span class="site-state-item-count">6</span>
               <span class="site-state-item-name">posts</span>
             </a>
           </div>
 
           <div class="site-state-item site-state-categories">
             <a href="/categories">
-              <span class="site-state-item-count">1</span>
+              <span class="site-state-item-count">2</span>
               <span class="site-state-item-name">categories</span>
               </a>
           </div>
 
           <div class="site-state-item site-state-tags">
             
-              <span class="site-state-item-count">1</span>
+              <span class="site-state-item-count">2</span>
               <span class="site-state-item-name">tags</span>
               
           </div>
@@ -350,7 +349,7 @@
           <div class="post-toc">
             
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#什么是AnyObjct"><span class="nav-number">1.</span> <span class="nav-text">什么是AnyObjct</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#什么时候用到_AnyObject"><span class="nav-number">2.</span> <span class="nav-text">什么时候用到 AnyObject</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#如何使用_AnyObject"><span class="nav-number">3.</span> <span class="nav-text">如何使用 AnyObject</span></a></li></ol></div>
+              <p class="post-toc-empty">This post does not have a Table Of Contents</p>
             
           </div>
           <div class="post-toc-indicator-bottom post-toc-indicator"></div>
@@ -575,9 +574,9 @@
 
     <script type="text/javascript">
       var disqus_shortname = 'smartv';
-      var disqus_identifier = '2015/07/30/Swift-what-is-the-AnyObject/';
-      var disqus_title = 'Swift: 什么是 AnyObject';
-      var disqus_url = 'http://yoursite.com/2015/07/30/Swift-what-is-the-AnyObject/';
+      var disqus_identifier = '2015/03/19/AnyObject-Objective-C-Compatiblility/';
+      var disqus_title = 'AnyObject: 与 Objective-C 兼容';
+      var disqus_url = 'http://yoursite.com/2015/03/19/AnyObject-Objective-C-Compatiblility/';
 
       function run_disqus_script(disqus_script){
         var dsq = document.createElement('script');

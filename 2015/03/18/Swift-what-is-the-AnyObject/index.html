@@ -47,7 +47,7 @@
 
 
 
-  <title> iOS 中 Block 原理 // Be smart and make thins done </title>
+  <title> Swift: 什么是 AnyObject // Be smart and make thins done </title>
 </head>
 
 <body>
@@ -142,7 +142,7 @@
           
           
             
-              iOS 中 Block 原理
+              Swift: 什么是 AnyObject
             
           
         </h1>
@@ -150,7 +150,7 @@
 
       <div class="post-meta">
         <span class="post-time">
-          Posted on 2013-10-17
+          Posted on 2015-03-18
         </span>
 
         
@@ -170,8 +170,8 @@
           
             <span class="post-comments-count">
             &nbsp; | &nbsp;
-            <a href="/2013/10/17/block-theory-in-iOS/#comments" >
-              <span class="post-comments-count disqus-comment-count" data-disqus-identifier="2013/10/17/block-theory-in-iOS/"></span>
+            <a href="/2015/03/18/Swift-what-is-the-AnyObject/#comments" >
+              <span class="post-comments-count disqus-comment-count" data-disqus-identifier="2015/03/18/Swift-what-is-the-AnyObject/"></span>
             </a>
           </span>
           
@@ -185,73 +185,23 @@
       
 
       
-        <p>在OC中提供一个块代码，类似 javaScript 中的闭包(值捕获)。先来看一个例子</p>
-<pre><code><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">(<span class="keyword">int</span> argc, <span class="keyword">const</span> <span class="keyword">char</span> * argv[])</span>
-</span>{
-    <span class="annotation">@autoreleasepool</span> {
+        <h2 id="什么是AnyObjct">什么是AnyObjct</h2><p>为了方便理解你可以将 <code>AnyObject</code> 类比成一种类型，就像 <code>Array</code> 或 <code>Double</code> 一样，但事实上它并不是一种类型。它主要用于兼容现有的 Objective-c API 和 iOS 代码， <code>AnyObject</code> 可以用来构建自己的数据结构，但并不经常使用。这有点不像 Swift，因为 Swift 是强类型语言，并且有类型推断的特性。 <code>AnyObject</code> 是只想一个对象（未知类）的指针，这有点奇怪哈。</p>
+<h2 id="什么时候用到_AnyObject">什么时候用到 AnyObject</h2><p>有可能在变量中见到：</p>
+<figure class="highlight kotlin"><table><tr><td class="code"><pre><span class="line"><span class="variable"><span class="keyword">var</span> destinationViewController</span>: AnyObject</span><br><span class="line"><span class="variable"><span class="keyword">var</span> toolbarItems</span>: [AnyObject]</span><br></pre></td></tr></table></figure>
+<p>或者在方法参数中出现：</p>
+<figure class="highlight swift"><table><tr><td class="code"><pre><span class="line"><span class="func"><span class="keyword">func</span> <span class="title">prepareForSegue</span><span class="params">(segue: UIStoryboardSegue, sender: AnyObject)</span></span></span><br><span class="line"><span class="func"><span class="keyword">func</span> <span class="title">addConstraints</span><span class="params">(constrains: [AnyObject])</span></span></span><br><span class="line"><span class="func"><span class="keyword">func</span> <span class="title">appendString</span><span class="params">(sender: AnyObject)</span></span></span><br></pre></td></tr></table></figure>
+<p>甚至可以作为一个方法的返回值：</p>
+<figure class="highlight delphi"><table><tr><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="function"><span class="keyword">function</span> <span class="title">buttonWithType</span><span class="params">(buttonType: UIButtonType)</span> -&gt; <span class="title">AnyObject</span></span></span><br></pre></td></tr></table></figure>
+<p>在我们使用 Storyboard 进行连线时候出现：</p>
+<h2 id="如何使用_AnyObject">如何使用 AnyObject</h2><p>既然它是指针，我们就不可能发送任何消息给它。<code>为了使用它，我们要把它转换成一种我们已知的类型，这也是我们唯一使用它的方式</code> 例如：</p>
+<figure class="highlight cs"><table><tr><td class="code"><pre><span class="line"><span class="keyword">var</span> destinationViewController: AnyObject</span><br><span class="line"><span class="keyword">let</span> planVC = destinationViewController <span class="keyword">as</span> planInfoViewController</span><br></pre></td></tr></table></figure>
+<p>如果 dvc 为空，会 Crash</p>
+<p>安全转换有两种办法避免：</p>
+<figure class="highlight nimrod"><table><tr><td class="code"><pre><span class="line"><span class="keyword">if</span> <span class="keyword">let</span> planVC = destinationViewController <span class="keyword">as</span>? planInfoViewController <span class="decorator">&#123;...&#125;</span> // <span class="keyword">as</span>? 会返回一个 <span class="type">Optional</span> 版本</span><br></pre></td></tr></table></figure>
+<p>or</p>
+<figure class="highlight nimrod"><table><tr><td class="code"><pre><span class="line"><span class="keyword">if</span> destinationViewController <span class="keyword">is</span> planInfoViewController <span class="decorator">&#123;...&#125;</span> //如果 <span class="literal">true</span> 那么就可以进行 <span class="keyword">as</span> 操作了</span><br></pre></td></tr></table></figure>
+<p>我更喜欢第一种，检查与转换一次搞定。</p>
 
-        <span class="comment">//__block int temp = 10;</span>
-        <span class="keyword">int</span> temp = <span class="number">10</span>;
-        <span class="keyword">void</span> (^block)() = ^{ <span class="comment">// 值捕获</span>
-            NSLog(@<span class="string">"temp=%d"</span>, temp);
-        };
-
-        temp = <span class="number">20</span>;
-        block();
-    }
-    <span class="keyword">return</span> <span class="number">0</span>;
-}
-</code></pre><p>答案是：temp = 10。那么如果在 temp 前面加了 __blcok 修饰符 temp = 20，这是为什么呢？</p>
-<p>接下来我们使用 clang -rewrite-objc 指令将 OC 代码转换成 C++ 代码，执行完毕之后。我们会得到一个 9万多行的 .cpp 文件，也就是说我们上面写的 几行代码，居然编译出 9万多行的代码。打开文件 直接拖到最下面，找到我们的 main 函数。</p>
-<pre><code>int main<span class="params">(int argc, const char * argv[])</span>
-{
-    <span class="comment">/* @autoreleasepool */</span> { __AtAutoreleasePool __autoreleasepool; 
-        int temp = <span class="number">10</span>;
-        void <span class="params">(*block)</span><span class="params">()</span> = <span class="params">(void <span class="params">(*)</span><span class="params">()</span>)</span>&amp;__main_block_impl_0<span class="params">(<span class="params">(void     *)</span>__main_block_func_0, &amp;__main_block_desc_0_DATA, temp)</span>;
-        temp = <span class="number">20</span>;
-        <span class="params">(<span class="params">(void <span class="params">(*)</span><span class="params">(__block_impl *)</span>)</span><span class="params">(<span class="params">(__block_impl *)</span>block)</span>-&gt;FuncPtr)</span>    <span class="params">(<span class="params">(__block_impl *)</span>block)</span>;
-    }
-    return <span class="number">0</span>;
-}
-</code></pre><p>由编译后的C++代码可以看出，没有加 __block 修饰符的 temp 是直接将 自己本身的值传递到 Block 中（值捕获）了。 这个时候你在怎么修改 temp 的值，都已经跟 Block 无关了。所以 temp 的值不会改变。</p>
-<p>接下来我们再看一下 加了 __block 修饰符的 temp 生成的代码是怎样的。</p>
-<pre><code>int main<span class="params">(int argc, const char * argv[])</span>
-{
-    <span class="comment">/* @autoreleasepool */</span> { __AtAutoreleasePool __autoreleasepool; 
-        __attribute__<span class="params">(<span class="params">(__blocks__<span class="params">(byref)</span>)</span>)</span> __Block_byref_temp_0 temp = {<span class="params">(void*)</span><span class="number">0</span>,<span class="params">(__Block_byref_temp_0 *)</span>&amp;temp, <span class="number">0</span>, sizeof<span class="params">(__Block_byref_temp_0)</span>, <span class="number">10</span>};
-        void <span class="params">(*block)</span><span class="params">()</span> = <span class="params">(void <span class="params">(*)</span><span class="params">()</span>)</span>&amp;__main_block_impl_0<span class="params">(<span class="params">(void *)</span>__main_block_func_0, &amp;__main_block_desc_0_DATA, <span class="params">(__Block_byref_temp_0 *)</span>&amp;temp, <span class="number">570425344</span>)</span>;
-        <span class="params">(temp.__forwarding-&gt;temp)</span> = <span class="number">20</span>;
-        <span class="params">(<span class="params">(void <span class="params">(*)</span><span class="params">(__block_impl *)</span>)</span><span class="params">(<span class="params">(__block_impl *)</span>block)</span>-&gt;FuncPtr)</span><span class="params">(<span class="params">(__block_impl *)</span>block)</span>;
-    }
-    return <span class="number">0</span>;
-}
-</code></pre><p>这个时候我们看到，temp 已经不叫 temp 了。编译器生成了一堆以 下划线开头的 属性，但是我们还是可以找到，它是将 &amp;temp 的指针传进去了。</p>
-<p>然后我们把 <code>(void (*)())</code> 强转的代码给删掉，方便阅读。接下来我们再看看 Block 本质是上面。</p>
-<pre><code>void <span class="list">(<span class="keyword">*block</span>)</span><span class="list">()</span> = &amp;__main_block_impl_0<span class="list">(<span class="keyword">__main_block_func_0</span>, <span class="keyword">&amp;__main_block_desc_0_DATA</span>, temp)</span><span class="comment">;</span>
-</code></pre><p>现在可以看出， Block 实际上就是一个指向 __main_block_impl_0 结构体的指针。</p>
-<pre><code><span class="keyword">struct</span> __main_block_impl_0 {
-  <span class="keyword">struct</span> __block_impl <span class="keyword">impl</span>;
-  <span class="keyword">struct</span> __main_block_desc_0* Desc;
-  <span class="keyword">int</span> temp;
-  __main_block_impl_0(void *fp, <span class="keyword">struct</span> __main_block_desc_0 *desc, <span class="keyword">int</span> _temp, <span class="keyword">int</span> flags=<span class="number">0</span>) : temp(_temp) {
-    <span class="keyword">impl</span>.isa = &amp;_NSConcreteStackBlock; 
-    <span class="keyword">impl</span>.Flags = flags;
-    <span class="keyword">impl</span>.FuncPtr = fp;
-    Desc = desc;
-  }
-};
-</code></pre><p>因为 C++ 结构体是有构造函数的，第四个参数为默认值，<code>temp(_temp)</code> 是将_temp的值赋值给 temp 。所以在函数中没有看到 对 temp 赋值的操作。搞定这个之后，我们再来看看 __main_block_func_0 函数里面到底是什么东西。</p>
-<pre><code><span class="keyword">static</span> <span class="keyword">void</span> __main_block_func_0(<span class="keyword">struct</span> __main_block_impl_0 *__cself) {
-  <span class="keyword">int</span> temp = __cself-&gt;temp; <span class="comment">// bound by copy</span>
-
-            <span class="built_in">NSLog</span>((<span class="built_in">NSString</span> *)&amp;__<span class="built_in">NSConstantStringImpl__var_folders__g_yvmzw12106sgs14rz4yj_msw0000gn_T_main_c4b143_mi_0</span>, temp);
-        }
-</code></pre><p>看到我们熟悉的 NSLog , 到这里我们可以看出，Block 实际就是把我们写的所有 Block 代码生成一个函数，然后将函数指针传给了 __main_block_func_0 结构体，并同时把 temp 的值传到Block 里面，所以当 Block 在调用时候，实际上就是在调用函数。</p>
-<h3 id="block_内存管理_Tips">block 内存管理 Tips</h3><pre><code>// <span class="number">1</span>.如果没有对<span class="keyword">block</span>进行copy操作，<span class="keyword">block</span>就存储于栈空间
-// <span class="number">2</span>.如果对<span class="keyword">block</span>进行copy操作，<span class="keyword">block</span>就存储于堆空间
-// <span class="number">3</span>.如果<span class="keyword">block</span>存储于栈空间，不会对<span class="keyword">block</span>内部所用到的对象产生强引用
-// <span class="number">4</span>.如果<span class="keyword">block</span>存储于堆空间，就会对<span class="keyword">block</span>内部所用到的对象产生强引用
-</code></pre>
       
     </div>
 
@@ -268,13 +218,13 @@
         <div class="post-nav">
           <div class="post-nav-prev post-nav-item">
             
-              <a href="/2014/08/03/read-notes-why-games-make-us-better/">read-notes-why-games-make-us-better </a>
+              <a href="/2015/03/19/AnyObject-Objective-C-Compatiblility/">AnyObject: 与 Objective-C 兼容</a>
             
           </div>
 
           <div class="post-nav-next post-nav-item">
             
-              <a href="/2013/07/30/ios-notes-media-player/">iOS 学习笔记 —— 媒体播放</a>
+              <a href="/2014/08/03/read-notes-why-games-make-us-better/">read-notes-why-games-make-us-better </a>
             
           </div>
         </div>
@@ -402,7 +352,7 @@
           <div class="post-toc">
             
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#block_内存管理_Tips"><span class="nav-number">1.</span> <span class="nav-text">block 内存管理 Tips</span></a></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#什么是AnyObjct"><span class="nav-number">1.</span> <span class="nav-text">什么是AnyObjct</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#什么时候用到_AnyObject"><span class="nav-number">2.</span> <span class="nav-text">什么时候用到 AnyObject</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#如何使用_AnyObject"><span class="nav-number">3.</span> <span class="nav-text">如何使用 AnyObject</span></a></li></ol></div>
             
           </div>
           <div class="post-toc-indicator-bottom post-toc-indicator"></div>
@@ -627,9 +577,9 @@
 
     <script type="text/javascript">
       var disqus_shortname = 'smartv';
-      var disqus_identifier = '2013/10/17/block-theory-in-iOS/';
-      var disqus_title = 'iOS 中 Block 原理';
-      var disqus_url = 'http://yoursite.com/2013/10/17/block-theory-in-iOS/';
+      var disqus_identifier = '2015/03/18/Swift-what-is-the-AnyObject/';
+      var disqus_title = 'Swift: 什么是 AnyObject';
+      var disqus_url = 'http://yoursite.com/2015/03/18/Swift-what-is-the-AnyObject/';
 
       function run_disqus_script(disqus_script){
         var dsq = document.createElement('script');

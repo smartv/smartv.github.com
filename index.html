@@ -144,8 +144,8 @@
           
           
             
-              <a class="post-title-link" href="/2015/07/30/Swift-what-is-the-AnyObject/">
-                Swift: 什么是 AnyObject
+              <a class="post-title-link" href="/2015/03/19/AnyObject-Objective-C-Compatiblility/">
+                AnyObject: 与 Objective-C 兼容
               </a>
             
           
@@ -154,7 +154,7 @@
 
       <div class="post-meta">
         <span class="post-time">
-          Posted on 2015-07-30
+          Posted on 2015-03-19
         </span>
 
         
@@ -174,8 +174,99 @@
           
             <span class="post-comments-count">
             &nbsp; | &nbsp;
-            <a href="/2015/07/30/Swift-what-is-the-AnyObject/#comments" >
-              <span class="post-comments-count disqus-comment-count" data-disqus-identifier="2015/07/30/Swift-what-is-the-AnyObject/"></span>
+            <a href="/2015/03/19/AnyObject-Objective-C-Compatiblility/#comments" >
+              <span class="post-comments-count disqus-comment-count" data-disqus-identifier="2015/03/19/AnyObject-Objective-C-Compatiblility/"></span>
+            </a>
+          </span>
+          
+        
+      </div>
+    </div>
+
+    <div class="post-body">
+
+      
+      
+
+      
+        
+          <p>众所周知，Objective-C 是 C 语言的超集，苹果借鉴了 Smalltalk 的面向对象和消息机制的思想对 C 语言进行了一套封装。既然是 C 语言的超集，那么在 Objective-C 环境执行C程序肯定没问题的。2014年 Swift 在 <a href="https://developer.apple.com/wwdc/" target="_blank" rel="external">Apple WWDC</a> 发布, 并且苹果大力推崇的情况下很有可能往后成为 iOS 平台上主流开发语言。但是现如今大部分公司和开发者还在使用 Objective-C 进行开发，为了更让开发者平稳过渡到 Swift 上的话，就肯定需要跟 Objective-C 兼容。</p>
+<p>苹果在兼容两个语言的时候遇上了很多麻烦，现在 Swift 也能使用原有的 Objective-C API，但是有一些特殊的数据类型在两种语言进行交接的时候</p>
+<pre><code><span class="built_in">NSString</span> 桥接成 String
+<span class="built_in">NSArray</span> 桥接成 Array&lt;AnyObject&gt;    
+<span class="built_in">NSDictionary</span> 桥接成 Dictionary&lt;<span class="built_in">NSObject</span>, AnyObject&gt;
+Int,Float,Double,Bool 桥接成 <span class="built_in">NSNumber</span>
+</code></pre><p>苹果神奇的将他们连接了起来，使得我们可以随意进行转换</p>
+<pre><code>let length = (someString as NSString)<span class="class">.length</span> <span class="comment">//length 是 NSSring 的方法</span>
+(someArray as NSSArray).<span class="function"><span class="title">componentJoinedByString</span><span class="params">(NSString)</span></span>
+</code></pre><p>Property List </p>
+<p>Propery List 不是一种类型，它属于一种工具类的东西，表面上是 AnyObject 但是背后里他是 NSString, NSArray, NSDictionary, NSNumber, NSData, NSDate 六种类型其中一种 或是桥接到 Swift 里的版本。</p>
+<p>为什么我们要用 Property List, 既然它是 AnyObject 我们使用起来就必须要 as 或 is 进行大量的类型转换。实际上主要原因有两个</p>
+<p>第一 用来隐式传递数据，类似于浏览器中的 Cookie，只有创建者才知道的如何解释的一组数据，只有创建者才知道 Property List 里面是 六种数据类型中的哪一种，对于其他人来说它们就是 AnyObject 但不知道具体是什么。其他人能做的就是把数据传送，提现了很好的封装性。</p>
+<p>第二 用于泛型数据结构，可以把一个数据结构变成一个泛型的数据结构。就好像 Enum 类型不是泛型，但是我们可以把它变成泛型的。</p>
+<p>还有一个好处就是 NSUserDefaults， 它只存储 Property List，通常用来存储用户数据、偏好设置什么的。由于它性能不高，不要用它来存储图片或者比较大的数据。由于它本身就是一个字典，我们可以像操作字典一样来操作它。</p>
+
+        
+      
+    </div>
+
+    <div class="post-footer">
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </div>
+  </div>
+
+
+    
+      
+
+  <div class="post post-type-normal ">
+    <div class="post-header">
+
+      
+      
+        <h1 class="post-title">
+          
+          
+            
+              <a class="post-title-link" href="/2015/03/18/Swift-what-is-the-AnyObject/">
+                Swift: 什么是 AnyObject
+              </a>
+            
+          
+        </h1>
+      
+
+      <div class="post-meta">
+        <span class="post-time">
+          Posted on 2015-03-18
+        </span>
+
+        
+          <span class="post-category">
+            &nbsp; | &nbsp; In
+            
+              <a href="/categories/iOS/">iOS</a>
+
+              
+              
+
+            
+          </span>
+        
+
+        
+          
+            <span class="post-comments-count">
+            &nbsp; | &nbsp;
+            <a href="/2015/03/18/Swift-what-is-the-AnyObject/#comments" >
+              <span class="post-comments-count disqus-comment-count" data-disqus-identifier="2015/03/18/Swift-what-is-the-AnyObject/"></span>
             </a>
           </span>
           
@@ -206,6 +297,103 @@
 <p>or</p>
 <figure class="highlight nimrod"><table><tr><td class="code"><pre><span class="line"><span class="keyword">if</span> destinationViewController <span class="keyword">is</span> planInfoViewController <span class="decorator">&#123;...&#125;</span> //如果 <span class="literal">true</span> 那么就可以进行 <span class="keyword">as</span> 操作了</span><br></pre></td></tr></table></figure>
 <p>我更喜欢第一种，检查与转换一次搞定。</p>
+
+        
+      
+    </div>
+
+    <div class="post-footer">
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </div>
+  </div>
+
+
+    
+      
+
+  <div class="post post-type-normal ">
+    <div class="post-header">
+
+      
+      
+        <h1 class="post-title">
+          
+          
+            
+              <a class="post-title-link" href="/2014/08/03/read-notes-why-games-make-us-better/">
+                read-notes-why-games-make-us-better 
+              </a>
+            
+          
+        </h1>
+      
+
+      <div class="post-meta">
+        <span class="post-time">
+          Posted on 2014-08-03
+        </span>
+
+        
+          <span class="post-category">
+            &nbsp; | &nbsp; In
+            
+              <a href="/categories/生活/">生活</a>
+
+              
+              
+
+            
+          </span>
+        
+
+        
+          
+            <span class="post-comments-count">
+            &nbsp; | &nbsp;
+            <a href="/2014/08/03/read-notes-why-games-make-us-better/#comments" >
+              <span class="post-comments-count disqus-comment-count" data-disqus-identifier="2014/08/03/read-notes-why-games-make-us-better/"></span>
+            </a>
+          </span>
+          
+        
+      </div>
+    </div>
+
+    <div class="post-body">
+
+      
+      
+
+      
+        
+          <h1 id="读书笔记—《游戏改变世界》">读书笔记—《游戏改变世界》</h1><p>  相信大部分少年跟我一样的沉迷过无数游戏。单机的、射击的、回合的、剧情的、角色扮演等等。从小霸王到PS4、XBOX One，从 CS、红警到 PC 网游，再到现如今的手游。我曾为了游戏曾在小伙伴家中排一个多小时队才能摸到红白机手柄，曾每月剩下零花钱甚至早餐钱只为充游戏点卡。甚至给母亲半夜从网吧抓回家中，依然爬墙返回到游戏的战场中。在没有读《游戏改变世界》之前，自己一直无法解释。为什么人们那么喜欢玩游戏，小时候也没有能力去探究。只是所有的大人都认为游戏让人丧失心智，堕落。</p>
+<h2 id="为什么游戏吸引人呢?">为什么游戏吸引人呢?</h2><p><strong>书中前言提出</strong></p>
+<blockquote>
+<p>游戏满足了现实世界无法满足的真实人类需求，带来了现实世界提供不了的奖励，它们以现实世界做不到的方式教育我们，鼓励我们，打动我们，以现实世界实现不了的方式把我们联系在一起，我们很“饥渴”，游戏填饱了我们，对更满意工作的饥渴，对强烈族群感的饥渴以及对更有意义的人生的饥渴。</p>
+</blockquote>
+<p><strong>书中提到的主要原因有三点</strong></p>
+<p><strong>即时反馈</strong></p>
+<p>我们在游戏中的任何操作，都会立即视觉化、数据化地呈现出来，例如：打一个怪，得多少经验。下一次副本，得多少游戏道具。对比工作的时候，我们无法知道老板什么时候给我们加薪升职。看书写作业无法知道期末考试自己考得多少分。而游戏你可以清晰知道自己差多少经验就升级了。</p>
+<p><strong>循序渐进、可实现的规则与目标（信心预期）</strong></p>
+<p>游戏永远不会从你一进入游戏穿着布衣手拿木剑，就让你去下副本。而是通过一系列的规则，去某个地方获取某种原料合成牛逼的装备，做某一项任务得多少经验和游戏币奖励，去一个符合你自己等级的场景进行打怪升级。</p>
+<p><strong>协作与成就感</strong></p>
+<p>组队打怪升级，拯救世界。就算是疯狂的小鸟也有为了保护自己的孩子给野猪吃掉的使命。</p>
+<h2 id="游戏将会对我们生活有哪些影响？">游戏将会对我们生活有哪些影响？</h2><p><strong>对紧急事件的积极心态</strong> </p>
+<p>紧急乐观可以想象成是极端的自我激励，急切的乐观精神结合着自己必胜的信念以及立即解决障碍的渴望，游戏玩家永远相信不可能的胜利也是可能的</p>
+<p><strong>擅长组件严密的社会结构</strong></p>
+<p>有一项研究表明，我们更喜欢和我们一起玩游戏的人，即便他们把你打败了，亦是如此。原因是，在游戏过程中我们积累了饿信任，我们之所以信任，就是因为他们和我们话费的同样的时间，遵守了同样的规则，拥有着共同的目标，并肩作战直到游戏结束。基于这些观点，一款游戏可以建立默契、信任和协作。进而建立一个更强健的社会关系网络</p>
+<p><strong>幸福的生产力</strong></p>
+<p>平均魔兽世界的玩家一周花费22个小时，就像在兼职一份工作一样。因为玩游戏相对于休闲或逛街来说，我们加倍玩游戏会让我们更开心。作为人类而言，我们更喜欢做哪些虽然很难但是更有趣的事情（工作），如果提供一个合适的任务给玩家，玩家就会一直不停地努力玩下去。</p>
+<p><strong>史诗的含义</strong></p>
+<p> 游戏玩家喜欢依附在那些关乎人类星际故事的威严任务里面，你所做的任何一点点琐事都会成为那个最终的美好愿景的一部分。众所周知全球最大的 wiki (多人协作创作的超文本系统) 是<a href="https://zh.wikipedia.org/wiki/Wikipedia:%E9%A6%96%E9%A1%B5" target="_blank" rel="external">维基百科</a>,而第二大的 wiki 就是魔兽世界 wiki，里面大概有八万篇文章，每个月超过500万人在使用它。这就创建了一个史诗般的故事。</p>
+<h2 id="总结">总结</h2><p>游戏玩家们是一个被高度授权、极具希望的群体，他们都认为自己具有改变世界的能力。唯一不同的是，他们相信他们能改变的世界是虚拟世界，而不是现实世界。这正是科学家们现在需要解决的难题。当我们从书中学习到了游戏针对 <strong>人性弱点</strong> 设计原理后，并不是像小时候所有家长所唾弃的那样游戏都是不好的（万恶的游戏），而是换一个角度看问题，如果我们把这些原理运用到学习或生活中。比如可以建立自己的学习反馈系统，看完一本书就给自己买一样物质东西，学习一个小时，就吃一个水果等。让生活、学习也借此变得让人上瘾。</p>
 
         
       
@@ -512,6 +700,17 @@
         </span>
 
         
+          <span class="post-category">
+            &nbsp; | &nbsp; In
+            
+              <a href="/categories/iOS/">iOS</a>
+
+              
+              
+
+            
+          </span>
+        
 
         
           
@@ -599,21 +798,21 @@
         <div class="site-state motion-element">
           <div class="site-state-item site-state-posts">
             <a href="/archives">
-              <span class="site-state-item-count">4</span>
+              <span class="site-state-item-count">6</span>
               <span class="site-state-item-name">posts</span>
             </a>
           </div>
 
           <div class="site-state-item site-state-categories">
             <a href="/categories">
-              <span class="site-state-item-count">1</span>
+              <span class="site-state-item-count">2</span>
               <span class="site-state-item-name">categories</span>
               </a>
           </div>
 
           <div class="site-state-item site-state-tags">
             
-              <span class="site-state-item-count">1</span>
+              <span class="site-state-item-count">2</span>
               <span class="site-state-item-name">tags</span>
               
           </div>
