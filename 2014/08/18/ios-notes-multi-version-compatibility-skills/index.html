@@ -47,7 +47,7 @@
 
 
 
-  <title> ios notes multi-version compatibility skills // Be smart and make thins done </title>
+  <title> iOS开发 —— 多版本系统兼容五个技巧 // Be smart and make thins done </title>
 </head>
 
 <body>
@@ -142,7 +142,7 @@
           
           
             
-              ios notes multi-version compatibility skills
+              iOS开发 —— 多版本系统兼容五个技巧
             
           
         </h1>
@@ -185,9 +185,9 @@
       
 
       
-        <h1 id="iOS开发——_5_个多版本系统兼容技巧">iOS开发—— 5 个多版本系统兼容技巧</h1><h2 id="前言">前言</h2><p>刚进公司一周，正在熟悉公司代码业务。由于之前的小伙伴使用了 iOS 7 SDK 中提供的 <code>setSeparatorInset</code> 方法（消息），同时没有对 iOS 7以下的系统进行测试，导致系统还是 iOS 6版本的用户 Crash。</p>
+        <h1 id="前言">前言</h1><p>刚进公司一周，正在熟悉公司代码业务。由于之前的小伙伴使用了 iOS 7 SDK 中提供的 <code>setSeparatorInset</code> 方法（消息），同时没有对 iOS 7以下的系统进行测试，导致系统还是 iOS 6版本的用户 Crash。</p>
 <p>问题处理之后，晚上边看中国好声音边收集了一些系统兼容的处理办法。</p>
-<h2 id="首先你需要知道_Deployment_Target_和_Base_SDK">首先你需要知道 Deployment Target 和 Base SDK</h2><ul>
+<h1 id="首先你需要知道_Deployment_Target_和_Base_SDK">首先你需要知道 Deployment Target 和 Base SDK</h1><ul>
 <li><strong>Deployment Target</strong> 可以字面意思理解就好，就是你希望所开发的 App 支持的最低系统版本。</li>
 <li><strong>Base SDK</strong> 用来编译APP的SDK（Software Development Kit）的版本，一般保持跟当前 XCode 所支持的最高版本。这样你才能使用苹果每次升级系统，新推出的各种 API 新特性。因此，一般情况下 Base SDK 都会高于 Deployment Target 的版本。那么问题来了，你在项目用使用了当前 Base SDK 版本里面的特性，编译会通过，但是 App 的手机系统版本低于 Base SDK 就会 Crash 了。就跟前言提到的一样。</li>
 </ul>
@@ -293,7 +293,7 @@ if </span>(klass<span class="function">)</span> {
 - (<span class="keyword">void</span>)compatible_setSeparatorInset:(<span class="built_in">UIEdgeInsets</span>) inset {
 
 }
-</code></pre><h3 id="参考">参考</h3><ul>
+</code></pre><h1 id="参考">参考</h1><ul>
 <li><p><a href="https://developer.apple.com/library/ios/documentation/DeveloperTools/Conceptual/cross_development/Introduction/Introduction.html#//apple_ref/doc/uid/10000163-BCICHGIE" target="_blank" rel="external">SDK Compatibility Guide</a></p>
 </li>
 <li><p><a href="http://stackoverflow.com/questions/3057325/weak-linking-check-if-a-class-exists-and-use-that-class" target="_blank" rel="external">Weak Linking - check if a class exists and use that class</a></p>
@@ -452,7 +452,7 @@ if </span>(klass<span class="function">)</span> {
           <div class="post-toc">
             
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#iOS开发——_5_个多版本系统兼容技巧"><span class="nav-number">1.</span> <span class="nav-text">iOS开发—— 5 个多版本系统兼容技巧</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#前言"><span class="nav-number">1.1.</span> <span class="nav-text">前言</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#首先你需要知道_Deployment_Target_和_Base_SDK"><span class="nav-number">1.2.</span> <span class="nav-text">首先你需要知道 Deployment Target 和 Base SDK</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1、使用_NSClassFromString_检查对象是否可用"><span class="nav-number">1.2.1.</span> <span class="nav-text">1、使用 NSClassFromString 检查对象是否可用</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2、使用宏进行编译时判断运行时系统版本"><span class="nav-number">1.2.2.</span> <span class="nav-text">2、使用宏进行编译时判断运行时系统版本</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3、使用_Weakly_Linked_特性做运行时的检查（iOS4-2_and_greater）"><span class="nav-number">1.2.3.</span> <span class="nav-text">3、使用 Weakly Linked 特性做运行时的检查（iOS4.2 and greater）</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="##"><span class="nav-number">1.3.</span> <span class="nav-text">#</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#4、用_Method_Swizzling_替换系统方法"><span class="nav-number">1.3.1.</span> <span class="nav-text">4、用 Method Swizzling 替换系统方法</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#5、运行时添加_Dummy_方法，减少代码改动"><span class="nav-number">1.3.2.</span> <span class="nav-text">5、运行时添加 Dummy 方法，减少代码改动</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#参考"><span class="nav-number">1.3.3.</span> <span class="nav-text">参考</span></a></li></ol></li></ol></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#前言"><span class="nav-number">1.</span> <span class="nav-text">前言</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#首先你需要知道_Deployment_Target_和_Base_SDK"><span class="nav-number">2.</span> <span class="nav-text">首先你需要知道 Deployment Target 和 Base SDK</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1、使用_NSClassFromString_检查对象是否可用"><span class="nav-number">2.0.1.</span> <span class="nav-text">1、使用 NSClassFromString 检查对象是否可用</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2、使用宏进行编译时判断运行时系统版本"><span class="nav-number">2.0.2.</span> <span class="nav-text">2、使用宏进行编译时判断运行时系统版本</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3、使用_Weakly_Linked_特性做运行时的检查（iOS4-2_and_greater）"><span class="nav-number">2.0.3.</span> <span class="nav-text">3、使用 Weakly Linked 特性做运行时的检查（iOS4.2 and greater）</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="##"><span class="nav-number">2.1.</span> <span class="nav-text">#</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#4、用_Method_Swizzling_替换系统方法"><span class="nav-number">2.1.1.</span> <span class="nav-text">4、用 Method Swizzling 替换系统方法</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#5、运行时添加_Dummy_方法，减少代码改动"><span class="nav-number">2.1.2.</span> <span class="nav-text">5、运行时添加 Dummy 方法，减少代码改动</span></a></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#参考"><span class="nav-number">3.</span> <span class="nav-text">参考</span></a></li></ol></div>
             
           </div>
           <div class="post-toc-indicator-bottom post-toc-indicator"></div>
@@ -678,7 +678,7 @@ if </span>(klass<span class="function">)</span> {
     <script type="text/javascript">
       var disqus_shortname = 'smartv';
       var disqus_identifier = '2014/08/18/ios-notes-multi-version-compatibility-skills/';
-      var disqus_title = 'ios notes multi-version compatibility skills';
+      var disqus_title = 'iOS开发 —— 多版本系统兼容五个技巧';
       var disqus_url = 'http://yoursite.com/2014/08/18/ios-notes-multi-version-compatibility-skills/';
 
       function run_disqus_script(disqus_script){

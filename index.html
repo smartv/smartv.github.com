@@ -328,7 +328,7 @@ Int,Float,Double,Bool 桥接成 <span class="built_in">NSNumber</span>
           
             
               <a class="post-title-link" href="/2014/08/18/ios-notes-multi-version-compatibility-skills/">
-                ios notes multi-version compatibility skills
+                iOS开发 —— 多版本系统兼容五个技巧
               </a>
             
           
@@ -373,9 +373,9 @@ Int,Float,Double,Bool 桥接成 <span class="built_in">NSNumber</span>
 
       
         
-          <h1 id="iOS开发——_5_个多版本系统兼容技巧">iOS开发—— 5 个多版本系统兼容技巧</h1><h2 id="前言">前言</h2><p>刚进公司一周，正在熟悉公司代码业务。由于之前的小伙伴使用了 iOS 7 SDK 中提供的 <code>setSeparatorInset</code> 方法（消息），同时没有对 iOS 7以下的系统进行测试，导致系统还是 iOS 6版本的用户 Crash。</p>
+          <h1 id="前言">前言</h1><p>刚进公司一周，正在熟悉公司代码业务。由于之前的小伙伴使用了 iOS 7 SDK 中提供的 <code>setSeparatorInset</code> 方法（消息），同时没有对 iOS 7以下的系统进行测试，导致系统还是 iOS 6版本的用户 Crash。</p>
 <p>问题处理之后，晚上边看中国好声音边收集了一些系统兼容的处理办法。</p>
-<h2 id="首先你需要知道_Deployment_Target_和_Base_SDK">首先你需要知道 Deployment Target 和 Base SDK</h2><ul>
+<h1 id="首先你需要知道_Deployment_Target_和_Base_SDK">首先你需要知道 Deployment Target 和 Base SDK</h1><ul>
 <li><strong>Deployment Target</strong> 可以字面意思理解就好，就是你希望所开发的 App 支持的最低系统版本。</li>
 <li><strong>Base SDK</strong> 用来编译APP的SDK（Software Development Kit）的版本，一般保持跟当前 XCode 所支持的最高版本。这样你才能使用苹果每次升级系统，新推出的各种 API 新特性。因此，一般情况下 Base SDK 都会高于 Deployment Target 的版本。那么问题来了，你在项目用使用了当前 Base SDK 版本里面的特性，编译会通过，但是 App 的手机系统版本低于 Base SDK 就会 Crash 了。就跟前言提到的一样。</li>
 </ul>
@@ -481,7 +481,7 @@ if </span>(klass<span class="function">)</span> {
 - (<span class="keyword">void</span>)compatible_setSeparatorInset:(<span class="built_in">UIEdgeInsets</span>) inset {
 
 }
-</code></pre><h3 id="参考">参考</h3><ul>
+</code></pre><h1 id="参考">参考</h1><ul>
 <li><p><a href="https://developer.apple.com/library/ios/documentation/DeveloperTools/Conceptual/cross_development/Introduction/Introduction.html#//apple_ref/doc/uid/10000163-BCICHGIE" target="_blank" rel="external">SDK Compatibility Guide</a></p>
 </li>
 <li><p><a href="http://stackoverflow.com/questions/3057325/weak-linking-check-if-a-class-exists-and-use-that-class" target="_blank" rel="external">Weak Linking - check if a class exists and use that class</a></p>
