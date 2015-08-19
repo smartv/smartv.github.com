@@ -883,6 +883,112 @@ if </span>(klass<span class="function">)</span> {
           
           
             
+              <a class="post-title-link" href="/2013/07/19/ios-notes-sand-box/">
+                iOS学习笔记——沙盒机制（SandBox)
+              </a>
+            
+          
+        </h1>
+      
+
+      <div class="post-meta">
+        <span class="post-time">
+          Posted on 2013-07-19
+        </span>
+
+        
+          <span class="post-category">
+            &nbsp; | &nbsp; In
+            
+              <a href="/categories/iOS/">iOS</a>
+
+              
+              
+
+            
+          </span>
+        
+
+        
+          
+            <span class="post-comments-count">
+            &nbsp; | &nbsp;
+            <a href="/2013/07/19/ios-notes-sand-box/#comments" >
+              <span class="post-comments-count disqus-comment-count" data-disqus-identifier="2013/07/19/ios-notes-sand-box/"></span>
+            </a>
+          </span>
+          
+        
+      </div>
+    </div>
+
+    <div class="post-body">
+
+      
+      
+
+      
+        
+          <h2 id="沙盒是什么？">沙盒是什么？</h2><blockquote>
+<p>在计算机安全领域，沙盒（英语：sandbox，又译为沙箱）是一种安全机制，为运行中的程序提供的隔离环境。通常是作为一些来源不可信、具破坏力或无法判定程序意图的程序提供实验之用。</p>
+</blockquote>
+<p>这种机制被苹果公司运用到了 iOS 平台上，每一个 APP 都有一个属于自己的沙盒，可以对其进行文件I/O操作，比如存取照片、音频、文本、属性列表等。但不可以访问其他 APP 的沙盒，每个 APP 都像是一个 <a href="https://zh.wikipedia.org/wiki/%E5%9C%B0%E7%90%86%E5%A4%A7%E5%8F%91%E7%8E%B0" target="_blank" rel="external">大航海时代之前</a> 的孤岛。</p>
+<h2 id="如何使用以及怎么使用沙盒？">如何使用以及怎么使用沙盒？</h2><h5 id="沙盒其实就是一个文件夹，文件结构如下：">沙盒其实就是一个文件夹，文件结构如下：</h5><ul>
+<li><p>Application Bundle：存放的是应用程序的源文件，包括资源文件和可执行文件。</p>
+<p><code>NSString *path = [[NSBundle mainBundle] bundlePath];</code></p>
+</li>
+<li><p>Documents：iTunes会同步该文件夹内容。所以，苹果建议将程序中建立的 或 在程序中浏览到的文件数据保存在该文件夹下</p>
+<p><code>NSString *path = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES).lastObject;</code></p>
+</li>
+</ul>
+<ul>
+<li><p>Library：</p>
+<ul>
+<li>Caches：适合存储体积大，不需要备份的非重要数据。<br><code>NSString *path = NSSearchPathForDirectoriesInDomains(NSCachesDirectory, NSUserDomainMask, YES).lastObject;</code></li>
+<li><p>Preferences：APP 的偏好设置，所以iTunes会同步该文件夹内容。</p>
+<figure class="highlight groovy"><table><tr><td class="code"><pre><span class="line"><span class="comment">//1.获得NSUserDefaults文件</span></span><br><span class="line">NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];</span><br><span class="line"></span><br><span class="line"><span class="comment">//2.向文件中写入内容</span></span><br><span class="line">[userDefaults <span class="string">setObject:</span>@<span class="string">"userName"</span> <span class="string">forKey:</span>@<span class="string">"userName"</span>];</span><br><span class="line"><span class="comment">//2.1立即同步</span></span><br><span class="line">[userDefaults synchronize];</span><br><span class="line"></span><br><span class="line"><span class="comment">//3.读取文件</span></span><br><span class="line">NSString *userName = [userDefaults <span class="string">objectForKey:</span>@<span class="string">"userName"</span>];</span><br></pre></td></tr></table></figure>
+</li>
+</ul>
+</li>
+<li><p>tmp： 用于存放临时文件,系统在应用程序退出后不定时清除</p>
+<p><code>NSString *path = NSTemporaryDirectory();</code></p>
+</li>
+</ul>
+<h2 id="补充">补充</h2><ul>
+<li>URL Scheme：通过URL Scheme 可以实现 App 之间互相调用，并且可以传递参数。</li>
+<li>模拟器的沙盒存放路径<br>打开 Finder ，快捷键 <code>shift + cmd + G</code>  输入 <code>/Users/(你的机器名称)/Library/Application Support/iPhone Simulator/</code></li>
+<li>便利小工具：<a href="http://simpholders.com/" target="_blank" rel="external">simpholders</a></li>
+</ul>
+
+        
+      
+    </div>
+
+    <div class="post-footer">
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </div>
+  </div>
+
+
+    
+      
+
+  <div class="post post-type-normal ">
+    <div class="post-header">
+
+      
+      
+        <h1 class="post-title">
+          
+          
+            
               <a class="post-title-link" href="/2013/07/17/ios-notes-synthesize/">
                 iOS 学习笔记 —— @synthesize合成指令
               </a>
@@ -995,7 +1101,7 @@ if </span>(klass<span class="function">)</span> {
         <div class="site-state motion-element">
           <div class="site-state-item site-state-posts">
             <a href="/archives">
-              <span class="site-state-item-count">7</span>
+              <span class="site-state-item-count">8</span>
               <span class="site-state-item-name">posts</span>
             </a>
           </div>

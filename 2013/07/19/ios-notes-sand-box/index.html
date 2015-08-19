@@ -47,7 +47,7 @@
 
 
 
-  <title> AnyObject: 与 Objective-C 兼容 // Be smart and make thins done </title>
+  <title> iOS学习笔记——沙盒机制（SandBox) // Be smart and make thins done </title>
 </head>
 
 <body>
@@ -142,7 +142,7 @@
           
           
             
-              AnyObject: 与 Objective-C 兼容
+              iOS学习笔记——沙盒机制（SandBox)
             
           
         </h1>
@@ -150,7 +150,7 @@
 
       <div class="post-meta">
         <span class="post-time">
-          Posted on 2015-03-19
+          Posted on 2013-07-19
         </span>
 
         
@@ -170,8 +170,8 @@
           
             <span class="post-comments-count">
             &nbsp; | &nbsp;
-            <a href="/2015/03/19/AnyObject-Objective-C-Compatiblility/#comments" >
-              <span class="post-comments-count disqus-comment-count" data-disqus-identifier="2015/03/19/AnyObject-Objective-C-Compatiblility/"></span>
+            <a href="/2013/07/19/ios-notes-sand-box/#comments" >
+              <span class="post-comments-count disqus-comment-count" data-disqus-identifier="2013/07/19/ios-notes-sand-box/"></span>
             </a>
           </span>
           
@@ -185,21 +185,36 @@
       
 
       
-        <p>众所周知，Objective-C 是 C 语言的超集，苹果借鉴了 Smalltalk 的面向对象和消息机制的思想对 C 语言进行了一套封装。既然是 C 语言的超集，那么在 Objective-C 环境执行C程序肯定没问题的。2014年 Swift 在 <a href="https://developer.apple.com/wwdc/" target="_blank" rel="external">Apple WWDC</a> 发布, 并且苹果大力推崇的情况下很有可能往后成为 iOS 平台上主流开发语言。但是现如今大部分公司和开发者还在使用 Objective-C 进行开发，为了更让开发者平稳过渡到 Swift 上的话，就肯定需要跟 Objective-C 兼容。</p>
-<p>苹果在兼容两个语言的时候遇上了很多麻烦，现在 Swift 也能使用原有的 Objective-C API，但是有一些特殊的数据类型在两种语言进行交接的时候</p>
-<pre><code><span class="built_in">NSString</span> 桥接成 String
-<span class="built_in">NSArray</span> 桥接成 Array&lt;AnyObject&gt;    
-<span class="built_in">NSDictionary</span> 桥接成 Dictionary&lt;<span class="built_in">NSObject</span>, AnyObject&gt;
-Int,Float,Double,Bool 桥接成 <span class="built_in">NSNumber</span>
-</code></pre><p>苹果神奇的将他们连接了起来，使得我们可以随意进行转换</p>
-<pre><code>let length = (someString as NSString)<span class="class">.length</span> <span class="comment">//length 是 NSSring 的方法</span>
-(someArray as NSSArray).<span class="function"><span class="title">componentJoinedByString</span><span class="params">(NSString)</span></span>
-</code></pre><p>Property List </p>
-<p>Propery List 不是一种类型，它属于一种工具类的东西，表面上是 AnyObject 但是背后里他是 NSString, NSArray, NSDictionary, NSNumber, NSData, NSDate 六种类型其中一种 或是桥接到 Swift 里的版本。</p>
-<p>为什么我们要用 Property List, 既然它是 AnyObject 我们使用起来就必须要 as 或 is 进行大量的类型转换。实际上主要原因有两个</p>
-<p>第一 用来隐式传递数据，类似于浏览器中的 Cookie，只有创建者才知道的如何解释的一组数据，只有创建者才知道 Property List 里面是 六种数据类型中的哪一种，对于其他人来说它们就是 AnyObject 但不知道具体是什么。其他人能做的就是把数据传送，提现了很好的封装性。</p>
-<p>第二 用于泛型数据结构，可以把一个数据结构变成一个泛型的数据结构。就好像 Enum 类型不是泛型，但是我们可以把它变成泛型的。</p>
-<p>还有一个好处就是 NSUserDefaults， 它只存储 Property List，通常用来存储用户数据、偏好设置什么的。由于它性能不高，不要用它来存储图片或者比较大的数据。由于它本身就是一个字典，我们可以像操作字典一样来操作它。</p>
+        <h2 id="沙盒是什么？">沙盒是什么？</h2><blockquote>
+<p>在计算机安全领域，沙盒（英语：sandbox，又译为沙箱）是一种安全机制，为运行中的程序提供的隔离环境。通常是作为一些来源不可信、具破坏力或无法判定程序意图的程序提供实验之用。</p>
+</blockquote>
+<p>这种机制被苹果公司运用到了 iOS 平台上，每一个 APP 都有一个属于自己的沙盒，可以对其进行文件I/O操作，比如存取照片、音频、文本、属性列表等。但不可以访问其他 APP 的沙盒，每个 APP 都像是一个 <a href="https://zh.wikipedia.org/wiki/%E5%9C%B0%E7%90%86%E5%A4%A7%E5%8F%91%E7%8E%B0" target="_blank" rel="external">大航海时代之前</a> 的孤岛。</p>
+<h2 id="如何使用以及怎么使用沙盒？">如何使用以及怎么使用沙盒？</h2><h5 id="沙盒其实就是一个文件夹，文件结构如下：">沙盒其实就是一个文件夹，文件结构如下：</h5><ul>
+<li><p>Application Bundle：存放的是应用程序的源文件，包括资源文件和可执行文件。</p>
+<p><code>NSString *path = [[NSBundle mainBundle] bundlePath];</code></p>
+</li>
+<li><p>Documents：iTunes会同步该文件夹内容。所以，苹果建议将程序中建立的 或 在程序中浏览到的文件数据保存在该文件夹下</p>
+<p><code>NSString *path = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES).lastObject;</code></p>
+</li>
+</ul>
+<ul>
+<li><p>Library：</p>
+<ul>
+<li>Caches：适合存储体积大，不需要备份的非重要数据。<br><code>NSString *path = NSSearchPathForDirectoriesInDomains(NSCachesDirectory, NSUserDomainMask, YES).lastObject;</code></li>
+<li><p>Preferences：APP 的偏好设置，所以iTunes会同步该文件夹内容。</p>
+<figure class="highlight groovy"><table><tr><td class="code"><pre><span class="line"><span class="comment">//1.获得NSUserDefaults文件</span></span><br><span class="line">NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];</span><br><span class="line"></span><br><span class="line"><span class="comment">//2.向文件中写入内容</span></span><br><span class="line">[userDefaults <span class="string">setObject:</span>@<span class="string">"userName"</span> <span class="string">forKey:</span>@<span class="string">"userName"</span>];</span><br><span class="line"><span class="comment">//2.1立即同步</span></span><br><span class="line">[userDefaults synchronize];</span><br><span class="line"></span><br><span class="line"><span class="comment">//3.读取文件</span></span><br><span class="line">NSString *userName = [userDefaults <span class="string">objectForKey:</span>@<span class="string">"userName"</span>];</span><br></pre></td></tr></table></figure>
+</li>
+</ul>
+</li>
+<li><p>tmp： 用于存放临时文件,系统在应用程序退出后不定时清除</p>
+<p><code>NSString *path = NSTemporaryDirectory();</code></p>
+</li>
+</ul>
+<h2 id="补充">补充</h2><ul>
+<li>URL Scheme：通过URL Scheme 可以实现 App 之间互相调用，并且可以传递参数。</li>
+<li>模拟器的沙盒存放路径<br>打开 Finder ，快捷键 <code>shift + cmd + G</code>  输入 <code>/Users/(你的机器名称)/Library/Application Support/iPhone Simulator/</code></li>
+<li>便利小工具：<a href="http://simpholders.com/" target="_blank" rel="external">simpholders</a></li>
+</ul>
 
       
     </div>
@@ -217,11 +232,13 @@ Int,Float,Double,Bool 桥接成 <span class="built_in">NSNumber</span>
         <div class="post-nav">
           <div class="post-nav-prev post-nav-item">
             
+              <a href="/2013/07/30/ios-notes-media-player/">iOS 学习笔记 —— 媒体播放</a>
+            
           </div>
 
           <div class="post-nav-next post-nav-item">
             
-              <a href="/2015/03/18/Swift-what-is-the-AnyObject/">Swift: 什么是 AnyObject</a>
+              <a href="/2013/07/17/ios-notes-synthesize/">iOS 学习笔记 —— @synthesize合成指令</a>
             
           </div>
         </div>
@@ -349,7 +366,7 @@ Int,Float,Double,Bool 桥接成 <span class="built_in">NSNumber</span>
           <div class="post-toc">
             
             
-              <p class="post-toc-empty">This post does not have a Table Of Contents</p>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#沙盒是什么？"><span class="nav-number">1.</span> <span class="nav-text">沙盒是什么？</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#如何使用以及怎么使用沙盒？"><span class="nav-number">2.</span> <span class="nav-text">如何使用以及怎么使用沙盒？</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#沙盒其实就是一个文件夹，文件结构如下："><span class="nav-number">2.0.0.1.</span> <span class="nav-text">沙盒其实就是一个文件夹，文件结构如下：</span></a></li></ol></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#补充"><span class="nav-number">3.</span> <span class="nav-text">补充</span></a></li></ol></div>
             
           </div>
           <div class="post-toc-indicator-bottom post-toc-indicator"></div>
@@ -574,9 +591,9 @@ Int,Float,Double,Bool 桥接成 <span class="built_in">NSNumber</span>
 
     <script type="text/javascript">
       var disqus_shortname = 'smartv';
-      var disqus_identifier = '2015/03/19/AnyObject-Objective-C-Compatiblility/';
-      var disqus_title = 'AnyObject: 与 Objective-C 兼容';
-      var disqus_url = 'http://yoursite.com/2015/03/19/AnyObject-Objective-C-Compatiblility/';
+      var disqus_identifier = '2013/07/19/ios-notes-sand-box/';
+      var disqus_title = 'iOS学习笔记——沙盒机制（SandBox)';
+      var disqus_url = 'http://yoursite.com/2013/07/19/ios-notes-sand-box/';
 
       function run_disqus_script(disqus_script){
         var dsq = document.createElement('script');
