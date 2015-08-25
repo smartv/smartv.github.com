@@ -47,13 +47,7 @@
 
 
 
-  <title>
-  
-
-  
-    about // Be smart and make thins done
-  
-</title>
+  <title> Archive // Be smart and make thins done </title>
 </head>
 
 <body>
@@ -67,7 +61,7 @@
   </div>
 <![endif]-->
 
-  <div class="container one-column ">
+  <div class="container one-column  page-archive ">
     <div class="headband"></div>
 
     <div id="header" class="header">
@@ -136,12 +130,59 @@
         <div id="content" class="content">
           
 
-  <div id="posts" class="posts-expand">
-    
-    
+  <div id="posts" class="posts-collapse">
+    <span class="archive-move-on"></span>
+
+    <span class="archive-page-counter">
       
+      
+      
+        
+      
+      Um..! 10 posts in total. Keep on posting.
+    </span>
+
     
+
+      
+      
+      
+
+      
+        
+        <div class="collection-title">
+          <h2 class="archive-year motion-element" id="archive-year-2015">2015</h2>
+        </div>
+      
+      
+
+      
+
+  <div class="post post-type-normal">
+    <div class="post-header">
+
+      <div class="post-title">
+        
+            <a class="post-title-link" href="/2015/08/19/ios-dev-network-optimization/">
+              iOS 开发 —— 网络层优化方案
+            </a>
+        
+      </div>
+
+      <div class="post-meta">
+        <span class="post-time"> 08-19 </span>
+      </div>
+
+    </div>
   </div>
+
+
+
+    
+
+  </div>
+
+  
 
 
         </div>
@@ -271,6 +312,12 @@
 
   
   
+  
+    <script type="text/javascript">
+      postMotionOptions = {stagger: 100, drag: true};
+    </script>
+  
+
 
   
   <script type="text/javascript" src="/vendors/fancybox/source/jquery.fancybox.pack.js"></script>
@@ -290,6 +337,12 @@
   <script type="text/javascript" src="/js/search-toggle.js"></script>
 
   
+  
+    <script type="text/javascript" id="motion.page.archive">
+      $('.archive-year').velocity('transition.slideLeftIn');
+    </script>
+  
+
 
   <script type="text/javascript">
     $(document).ready(function () {

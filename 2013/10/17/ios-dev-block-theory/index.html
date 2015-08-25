@@ -47,7 +47,7 @@
 
 
 
-  <title> iOS 开发 —— 多版本系统兼容五个技巧 // Be smart and make thins done </title>
+  <title> iOS 开发 —— Block 原理 // Be smart and make thins done </title>
 </head>
 
 <body>
@@ -142,7 +142,7 @@
           
           
             
-              iOS 开发 —— 多版本系统兼容五个技巧
+              iOS 开发 —— Block 原理
             
           
         </h1>
@@ -150,7 +150,7 @@
 
       <div class="post-meta">
         <span class="post-time">
-          Posted on 2014-08-18
+          Posted on 2013-10-17
         </span>
 
         
@@ -170,8 +170,8 @@
           
             <span class="post-comments-count">
             &nbsp; | &nbsp;
-            <a href="/2014/08/18/ios-notes-multi-version-compatibility-skills/#comments" >
-              <span class="post-comments-count disqus-comment-count" data-disqus-identifier="2014/08/18/ios-notes-multi-version-compatibility-skills/"></span>
+            <a href="/2013/10/17/ios-dev-block-theory/#comments" >
+              <span class="post-comments-count disqus-comment-count" data-disqus-identifier="2013/10/17/ios-dev-block-theory/"></span>
             </a>
           </span>
           
@@ -185,128 +185,73 @@
       
 
       
-        <h1 id="前言">前言</h1><p>刚进公司一周，正在熟悉公司代码业务。由于之前的小伙伴使用了 iOS 7 SDK 中提供的 <code>setSeparatorInset</code> 方法（消息），同时没有对 iOS 7以下的系统进行测试，导致系统还是 iOS 6版本的用户 Crash。</p>
-<p>问题处理之后，晚上收集了常用的处理 iOS 多版本系统兼容的处理办法，下面做个总结。</p>
-<h3 id="0、首先你需要知道_Deployment_Target_和_Base_SDK">0、首先你需要知道 Deployment Target 和 Base SDK</h3><ul>
-<li><strong>Deployment Target</strong> 可以字面意思理解就好，就是你希望所开发的 App 支持的最低系统版本。</li>
-<li><strong>Base SDK</strong> 用来编译APP的SDK（Software Development Kit）的版本，一般保持跟当前 XCode 所支持的最高版本。这样你才能使用苹果每次升级系统，新推出的各种 API 新特性。因此，一般情况下 Base SDK 都会高于 Deployment Target 的版本。那么问题来了，你在项目用使用了当前 Base SDK 版本里面的特性，编译会通过，但是 App 的手机系统版本低于 Base SDK 就会 Crash 了。就跟前言提到的一样。</li>
-</ul>
-<h3 id="1、使用_NSClassFromString_检查对象是否可用">1、使用 NSClassFromString 检查对象是否可用</h3><pre><code>Class klass =<span class="function"> NSClassFromString(</span>@<span class="string">"SomeClass"</span><span class="function">)</span>;<span class="instruction">
-if </span>(klass<span class="function">)</span> {
-    // class exists
-    id<span class="instruction"> instance </span>= <span class="keyword">[</span><span class="keyword">[</span>klass alloc] init];
-} else {
-    // class doesn't exist
-}
-</code></pre><h3 id="2、使用宏进行编译时判断运行时系统版本">2、使用宏进行编译时判断运行时系统版本</h3><p>宏只是一种预定义的文本替换，只在编译时有用。主要用到两个系统预设的宏定义</p>
-<p><code>__IPHONE_OS_VERSION_MIN_REQUIRED</code> 等价于 Deployment Target<br><code>__IPHONE_OS_VERSION_MAX_ALLOWED</code>  等价于 Base SDK</p>
-<p>例如需要检查 UITableViewCell 的 <code>setSeparatorInset</code> 方法。（宏可以嵌套出现）</p>
-<pre><code><span class="comment">// 编译时判断：检查SDK版本</span>
-<span class="preprocessor">#<span class="keyword">if</span> __IPHONE_OS_VERSION_MAX_ALLOWED &gt; 80000</span>
-    <span class="comment">// 运行时判断：检查当前系统版本</span>
-    <span class="keyword">if</span> ([UIDevice currentDevice].systemVersion.floatValue &gt; <span class="number">8.0f</span>) {
-        <span class="comment">// 使用 setSeparatorInset...</span>
-    } <span class="keyword">else</span> {
-        <span class="comment">// 使用别的解决方案...</span>
+        <p>在OC中提供一个块代码，类似 javaScript 中的闭包(值捕获)。先来看一个例子</p>
+<pre><code><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">(<span class="keyword">int</span> argc, <span class="keyword">const</span> <span class="keyword">char</span> * argv[])</span>
+</span>{
+    <span class="annotation">@autoreleasepool</span> {
+
+        <span class="comment">//__block int temp = 10;</span>
+        <span class="keyword">int</span> temp = <span class="number">10</span>;
+        <span class="keyword">void</span> (^block)() = ^{ <span class="comment">// 值捕获</span>
+            NSLog(@<span class="string">"temp=%d"</span>, temp);
+        };
+
+        temp = <span class="number">20</span>;
+        block();
     }
-<span class="preprocessor">#<span class="keyword">else</span></span>
-    <span class="comment">// ...</span>
-<span class="preprocessor">#<span class="keyword">endif</span></span>
-</code></pre><h3 id="3、使用_Weakly_Linked_特性做运行时的检查（iOS4-2_and_greater）">3、使用 Weakly Linked 特性做运行时的检查（iOS4.2 and greater）</h3><p>这个特性是基于 iOS4.2系统提供的 <code>NS_CLASS_AVAILABLE</code> 才能使用的</p>
-<pre><code><span class="keyword">if</span> ([SomeClass <span class="class"><span class="keyword">class</span>]) {</span>
-    // <span class="class"><span class="keyword">class</span> <span class="title">exists</span></span>
-    SomeClass *instance = [[SomeClass alloc] init];
-} <span class="keyword">else</span> {
-    // <span class="class"><span class="keyword">class</span> <span class="title">doesn</span>'<span class="title">t</span> <span class="title">exist</span></span>
+    <span class="keyword">return</span> <span class="number">0</span>;
 }
-</code></pre><p>对方法进行判断</p>
-<pre><code><span class="tag">if</span> ([UITableViewCell <span class="attribute">instancesRespondToSelector</span>:<span class="variable">@selector</span> (<span class="attribute">setSeparatorInset</span>:)]) {
-    <span class="comment">//  使用 setSeparatorInset...</span>
-} <span class="tag">else</span> {
-    <span class="comment">// 使用别的解决方案...</span>
-}
-</code></pre><p><em>同时还可以进行 Framework 进行引用 TARGETS-&gt;Build Phases-&gt;Link Binary With Libraries 选择该 Framework，将 Required 改为 Optional</em></p>
-<h3 id="4、用_Method_Swizzling_替换系统方法">4、用 Method Swizzling 替换系统方法</h3><p>在iOS 6中 UILabel的背景默认是白色，而 iOS6以后则是透明的，如果在每个用到 UILable 的地方，都需要手动设置一次背景颜色，既繁琐又容易遗漏。这种情况就可以通过 Runtime 动态的特性在运行时把系统的方法替换掉，实现自己想要的效果了。</p>
-<pre><code><span class="class"><span class="keyword">@implementation</span> <span class="title">UILabel</span> (<span class="title">XSCompatibility</span>)</span>
-
-
-+ (<span class="keyword">void</span>)load {
- <span class="keyword">if</span> ([<span class="built_in">UIDevice</span> currentDevice]<span class="variable">.systemVersion</span><span class="variable">.floatValue</span> &lt; <span class="number">7.0</span>f) {
-
-        <span class="keyword">static</span> <span class="built_in">dispatch_once_t</span> onceToken;
-        <span class="built_in">dispatch_once</span>(&amp;onceToken, ^{
-            Class class = [<span class="keyword">self</span> class];
-
-            SEL originalSelector = <span class="keyword">@selector</span>(initWithFrame:);
-            SEL swizzledSelector = <span class="keyword">@selector</span>(compatible_initWithFrame:);
-
-            Method originalMethod = class_getInstanceMethod(class, originalSelector);
-            Method swizzledMethod = class_getInstanceMethod(class, swizzledSelector);
-
-            <span class="built_in">BOOL</span> didAddMethod =
-                class_addMethod(class,
-                    originalSelector,
-                    method_getImplementation(swizzledMethod),
-                    method_getTypeEncoding(swizzledMethod));
-
-            <span class="keyword">if</span> (didAddMethod) {
-                class_replaceMethod(class,
-                    swizzledSelector,
-                    method_getImplementation(originalMethod),
-                    method_getTypeEncoding(originalMethod));
-            } <span class="keyword">else</span> {
-                method_exchangeImplementations(originalMethod, swizzledMethod);
-            }
-        });
+</code></pre><p>答案是：temp = 10。那么如果在 temp 前面加了 __blcok 修饰符 temp = 20，这是为什么呢？</p>
+<p>接下来我们使用 clang -rewrite-objc 指令将 OC 代码转换成 C++ 代码，执行完毕之后。我们会得到一个 9万多行的 .cpp 文件，也就是说我们上面写的 几行代码，居然编译出 9万多行的代码。打开文件 直接拖到最下面，找到我们的 main 函数。</p>
+<pre><code>int main<span class="params">(int argc, const char * argv[])</span>
+{
+    <span class="comment">/* @autoreleasepool */</span> { __AtAutoreleasePool __autoreleasepool; 
+        int temp = <span class="number">10</span>;
+        void <span class="params">(*block)</span><span class="params">()</span> = <span class="params">(void <span class="params">(*)</span><span class="params">()</span>)</span>&amp;__main_block_impl_0<span class="params">(<span class="params">(void     *)</span>__main_block_func_0, &amp;__main_block_desc_0_DATA, temp)</span>;
+        temp = <span class="number">20</span>;
+        <span class="params">(<span class="params">(void <span class="params">(*)</span><span class="params">(__block_impl *)</span>)</span><span class="params">(<span class="params">(__block_impl *)</span>block)</span>-&gt;FuncPtr)</span>    <span class="params">(<span class="params">(__block_impl *)</span>block)</span>;
     }
+    return <span class="number">0</span>;
 }
-
-<span class="comment">// initWithFrame</span>
-- (<span class="keyword">id</span>)compatible_initWithFrame:(<span class="built_in">CGRect</span>)frame {
-    <span class="keyword">id</span> newSelf = [<span class="keyword">self</span> compatible_initWithFrame:frame];
-    <span class="comment">// 设置透明背景色</span>
-    ((<span class="built_in">UILabel</span> *)newSelf)<span class="variable">.backgroundColor</span> = [<span class="built_in">UIColor</span> clearColor];
-    <span class="keyword">return</span> newSelf;
-}
-
-<span class="comment">// initWithCoder...</span>
-</code></pre><h3 id="5、运行时添加动态添加方法，减少代码改动">5、运行时添加动态添加方法，减少代码改动</h3><p>以 UITableViewCell 的 <code>setSeparatorInset:</code> 方法为例，在iOS6中找不到 <code>separatorInset:</code> 方法的时候就会 Crash。那就进行添加一个方法进行消息接收就可以了。</p>
-<pre><code><span class="class"><span class="keyword">@implementation</span> <span class="title">UITableViewCell</span> (<span class="title">XSCompatibility</span>)</span>
-
-+ (<span class="keyword">void</span>)load {
-
-<span class="preprocessor">#if __IPHONE_OS_VERSION_MAX_ALLOWED &gt; __IPHONE_7_0</span>
-
-    <span class="keyword">if</span> ([<span class="built_in">UIDevice</span> currentDevice]<span class="variable">.systemVersion</span><span class="variable">.floatValue</span> &lt; <span class="number">7.0</span>f) {
-        Method newMethod = class_getInstanceMethod(<span class="keyword">self</span>, <span class="keyword">@selector</span>(compatible_setSeparatorInset:));
-
-        class_addMethod(
-                <span class="keyword">self</span>,
-                <span class="keyword">@selector</span>(setSeparatorInset:),
-                method_getImplementation(newMethod),
-                method_getTypeEncoding(newMethod));
+</code></pre><p>由编译后的C++代码可以看出，没有加 __block 修饰符的 temp 是直接将 自己本身的值传递到 Block 中（值捕获）了。 这个时候你在怎么修改 temp 的值，都已经跟 Block 无关了。所以 temp 的值不会改变。</p>
+<p>接下来我们再看一下 加了 __block 修饰符的 temp 生成的代码是怎样的。</p>
+<pre><code>int main<span class="params">(int argc, const char * argv[])</span>
+{
+    <span class="comment">/* @autoreleasepool */</span> { __AtAutoreleasePool __autoreleasepool; 
+        __attribute__<span class="params">(<span class="params">(__blocks__<span class="params">(byref)</span>)</span>)</span> __Block_byref_temp_0 temp = {<span class="params">(void*)</span><span class="number">0</span>,<span class="params">(__Block_byref_temp_0 *)</span>&amp;temp, <span class="number">0</span>, sizeof<span class="params">(__Block_byref_temp_0)</span>, <span class="number">10</span>};
+        void <span class="params">(*block)</span><span class="params">()</span> = <span class="params">(void <span class="params">(*)</span><span class="params">()</span>)</span>&amp;__main_block_impl_0<span class="params">(<span class="params">(void *)</span>__main_block_func_0, &amp;__main_block_desc_0_DATA, <span class="params">(__Block_byref_temp_0 *)</span>&amp;temp, <span class="number">570425344</span>)</span>;
+        <span class="params">(temp.__forwarding-&gt;temp)</span> = <span class="number">20</span>;
+        <span class="params">(<span class="params">(void <span class="params">(*)</span><span class="params">(__block_impl *)</span>)</span><span class="params">(<span class="params">(__block_impl *)</span>block)</span>-&gt;FuncPtr)</span><span class="params">(<span class="params">(__block_impl *)</span>block)</span>;
     }
-<span class="preprocessor">#endif</span>
+    return <span class="number">0</span>;
 }
+</code></pre><p>这个时候我们看到，temp 已经不叫 temp 了。编译器生成了一堆以 下划线开头的 属性，但是我们还是可以找到，它是将 &amp;temp 的指针传进去了。</p>
+<p>然后我们把 <code>(void (*)())</code> 强转的代码给删掉，方便阅读。接下来我们再看看 Block 本质是上面。</p>
+<pre><code>void <span class="list">(<span class="keyword">*block</span>)</span><span class="list">()</span> = &amp;__main_block_impl_0<span class="list">(<span class="keyword">__main_block_func_0</span>, <span class="keyword">&amp;__main_block_desc_0_DATA</span>, temp)</span><span class="comment">;</span>
+</code></pre><p>现在可以看出， Block 实际上就是一个指向 __main_block_impl_0 结构体的指针。</p>
+<pre><code><span class="keyword">struct</span> __main_block_impl_0 {
+  <span class="keyword">struct</span> __block_impl <span class="keyword">impl</span>;
+  <span class="keyword">struct</span> __main_block_desc_0* Desc;
+  <span class="keyword">int</span> temp;
+  __main_block_impl_0(void *fp, <span class="keyword">struct</span> __main_block_desc_0 *desc, <span class="keyword">int</span> _temp, <span class="keyword">int</span> flags=<span class="number">0</span>) : temp(_temp) {
+    <span class="keyword">impl</span>.isa = &amp;_NSConcreteStackBlock; 
+    <span class="keyword">impl</span>.Flags = flags;
+    <span class="keyword">impl</span>.FuncPtr = fp;
+    Desc = desc;
+  }
+};
+</code></pre><p>因为 C++ 结构体是有构造函数的，第四个参数为默认值，<code>temp(_temp)</code> 是将_temp的值赋值给 temp 。所以在函数中没有看到 对 temp 赋值的操作。搞定这个之后，我们再来看看 __main_block_func_0 函数里面到底是什么东西。</p>
+<pre><code><span class="keyword">static</span> <span class="keyword">void</span> __main_block_func_0(<span class="keyword">struct</span> __main_block_impl_0 *__cself) {
+  <span class="keyword">int</span> temp = __cself-&gt;temp; <span class="comment">// bound by copy</span>
 
-
-- (<span class="keyword">void</span>) compatible_dummySetSeparatorInset:(<span class="built_in">UIEdgeInsets</span>) inset {
-
-}
-</code></pre><h1 id="总结">总结</h1><p>虽然 Apple 每次发布 iOS 系统更新，用户都能积极响应进行更新。但是想让全部用户都更新那是不可能的，所以想让 App 提供给更多的用户使用，以上五种方法应该会对你有用。根据自己的场景选择相应的方法进行处理。任何一种方法滥用都是耍流氓。</p>
-<h1 id="参考">参考</h1><ul>
-<li><p><a href="https://developer.apple.com/library/ios/documentation/DeveloperTools/Conceptual/cross_development/Introduction/Introduction.html#//apple_ref/doc/uid/10000163-BCICHGIE" target="_blank" rel="external">SDK Compatibility Guide</a></p>
-</li>
-<li><p><a href="https://developer.apple.com/library/ios/documentation/Cocoa/Conceptual/ObjCRuntimeGuide/RevisionHistory.html" target="_blank" rel="external">Objective-C Runtime Programming Guide</a></p>
-</li>
-<li><p><a href="http://stackoverflow.com/questions/3057325/weak-linking-check-if-a-class-exists-and-use-that-class" target="_blank" rel="external">Weak Linking - check if a class exists and use that class</a></p>
-</li>
-<li><p><a href="http://stackoverflow.com/questions/19789958/xcode-preprocessor-macro-to-check-if-base-sdk-ios-7-0" target="_blank" rel="external">Xcode preprocessor macro to check if Base SDK &gt;= iOS 7.0</a></p>
-</li>
-<li><p><a href="http://stackoverflow.com/questions/3027120/how-to-make-iphone-app-compatible-with-multiple-sdk-firmware-versions" target="_blank" rel="external">How To Make iPhone App compatible with multiple SDK (firmware) versions</a></p>
-</li>
-</ul>
-
+            <span class="built_in">NSLog</span>((<span class="built_in">NSString</span> *)&amp;__<span class="built_in">NSConstantStringImpl__var_folders__g_yvmzw12106sgs14rz4yj_msw0000gn_T_main_c4b143_mi_0</span>, temp);
+        }
+</code></pre><p>看到我们熟悉的 NSLog , 到这里我们可以看出，Block 实际就是把我们写的所有 Block 代码生成一个函数，然后将函数指针传给了 __main_block_func_0 结构体，并同时把 temp 的值传到Block 里面，所以当 Block 在调用时候，实际上就是在调用函数。</p>
+<h3 id="block_内存管理_Tips">block 内存管理 Tips</h3><pre><code>// <span class="number">1</span>.如果没有对<span class="keyword">block</span>进行copy操作，<span class="keyword">block</span>就存储于栈空间
+// <span class="number">2</span>.如果对<span class="keyword">block</span>进行copy操作，<span class="keyword">block</span>就存储于堆空间
+// <span class="number">3</span>.如果<span class="keyword">block</span>存储于栈空间，不会对<span class="keyword">block</span>内部所用到的对象产生强引用
+// <span class="number">4</span>.如果<span class="keyword">block</span>存储于堆空间，就会对<span class="keyword">block</span>内部所用到的对象产生强引用
+</code></pre>
       
     </div>
 
@@ -323,13 +268,13 @@ if </span>(klass<span class="function">)</span> {
         <div class="post-nav">
           <div class="post-nav-prev post-nav-item">
             
-              <a href="/2015/03/18/swift-what-is-the-anyObject/">Swift: 什么是 AnyObject</a>
+              <a href="/2014/08/03/read-notes-why-games-make-us-better/">读书笔记 ——《游戏改变世界》 </a>
             
           </div>
 
           <div class="post-nav-next post-nav-item">
             
-              <a href="/2014/08/03/read-notes-why-games-make-us-better/">读书笔记 ——《游戏改变世界》 </a>
+              <a href="/2013/07/30/ios-notes-media-player/">iOS 学习笔记 —— 媒体播放</a>
             
           </div>
         </div>
@@ -457,7 +402,7 @@ if </span>(klass<span class="function">)</span> {
           <div class="post-toc">
             
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#前言"><span class="nav-number">1.</span> <span class="nav-text">前言</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#0、首先你需要知道_Deployment_Target_和_Base_SDK"><span class="nav-number">1.0.1.</span> <span class="nav-text">0、首先你需要知道 Deployment Target 和 Base SDK</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#1、使用_NSClassFromString_检查对象是否可用"><span class="nav-number">1.0.2.</span> <span class="nav-text">1、使用 NSClassFromString 检查对象是否可用</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2、使用宏进行编译时判断运行时系统版本"><span class="nav-number">1.0.3.</span> <span class="nav-text">2、使用宏进行编译时判断运行时系统版本</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3、使用_Weakly_Linked_特性做运行时的检查（iOS4-2_and_greater）"><span class="nav-number">1.0.4.</span> <span class="nav-text">3、使用 Weakly Linked 特性做运行时的检查（iOS4.2 and greater）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4、用_Method_Swizzling_替换系统方法"><span class="nav-number">1.0.5.</span> <span class="nav-text">4、用 Method Swizzling 替换系统方法</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#5、运行时添加动态添加方法，减少代码改动"><span class="nav-number">1.0.6.</span> <span class="nav-text">5、运行时添加动态添加方法，减少代码改动</span></a></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#总结"><span class="nav-number">2.</span> <span class="nav-text">总结</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#参考"><span class="nav-number">3.</span> <span class="nav-text">参考</span></a></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#block_内存管理_Tips"><span class="nav-number">1.</span> <span class="nav-text">block 内存管理 Tips</span></a></li></ol></div>
             
           </div>
           <div class="post-toc-indicator-bottom post-toc-indicator"></div>
@@ -682,9 +627,9 @@ if </span>(klass<span class="function">)</span> {
 
     <script type="text/javascript">
       var disqus_shortname = 'smartv';
-      var disqus_identifier = '2014/08/18/ios-notes-multi-version-compatibility-skills/';
-      var disqus_title = 'iOS 开发 —— 多版本系统兼容五个技巧';
-      var disqus_url = 'http://yoursite.com/2014/08/18/ios-notes-multi-version-compatibility-skills/';
+      var disqus_identifier = '2013/10/17/ios-dev-block-theory/';
+      var disqus_title = 'iOS 开发 —— Block 原理';
+      var disqus_url = 'http://yoursite.com/2013/10/17/ios-dev-block-theory/';
 
       function run_disqus_script(disqus_script){
         var dsq = document.createElement('script');

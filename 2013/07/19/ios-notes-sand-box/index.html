@@ -194,18 +194,22 @@
 <p><code>NSString *path = [[NSBundle mainBundle] bundlePath];</code></p>
 </li>
 <li><p>Documents：iTunes会同步该文件夹内容。所以，苹果建议将程序中建立的 或 在程序中浏览到的文件数据保存在该文件夹下</p>
-<p><code>NSString *path = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES).lastObject;</code></p>
-</li>
+<pre><code><span class="built_in">NSString</span> *path = <span class="built_in">NSSearchPathForDirectoriesInDomains</span>(<span class="built_in">NSDocumentDirectory</span>, <span class="built_in">NSUserDomainMask</span>, <span class="literal">YES</span>)<span class="variable">.lastObject</span>;
+</code></pre></li>
 </ul>
 <ul>
 <li><p>Library：</p>
 <ul>
-<li>Caches：适合存储体积大，不需要备份的非重要数据。<br><code>NSString *path = NSSearchPathForDirectoriesInDomains(NSCachesDirectory, NSUserDomainMask, YES).lastObject;</code></li>
-<li><p>Preferences：APP 的偏好设置，所以iTunes会同步该文件夹内容。</p>
-<figure class="highlight groovy"><table><tr><td class="code"><pre><span class="line"><span class="comment">//1.获得NSUserDefaults文件</span></span><br><span class="line">NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];</span><br><span class="line"></span><br><span class="line"><span class="comment">//2.向文件中写入内容</span></span><br><span class="line">[userDefaults <span class="string">setObject:</span>@<span class="string">"userName"</span> <span class="string">forKey:</span>@<span class="string">"userName"</span>];</span><br><span class="line"><span class="comment">//2.1立即同步</span></span><br><span class="line">[userDefaults synchronize];</span><br><span class="line"></span><br><span class="line"><span class="comment">//3.读取文件</span></span><br><span class="line">NSString *userName = [userDefaults <span class="string">objectForKey:</span>@<span class="string">"userName"</span>];</span><br></pre></td></tr></table></figure>
+<li><p>Caches：适合存储体积大，不需要备份的非重要数据。</p>
+<figure class="highlight objectivec"><table><tr><td class="code"><pre><span class="line"><span class="built_in">NSString</span> *path = <span class="built_in">NSSearchPathForDirectoriesInDomains</span>(<span class="built_in">NSCachesDirectory</span>, <span class="built_in">NSUserDomainMask</span>, <span class="literal">YES</span>)<span class="variable">.lastObject</span>;</span><br></pre></td></tr></table></figure>
 </li>
 </ul>
 </li>
+</ul>
+<pre><code>- Preferences：APP 的偏好设置，所以iTunes会同步该文件夹内容。
+
+<span class="comment"><figure class="highlight groovy"><table><tr><td class="code"><pre><span class="line"><span class="comment">//1.获得NSUserDefaults文件</span></span><br><span class="line">NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];</span><br><span class="line"></span><br><span class="line"><span class="comment">//2.向文件中写入内容</span></span><br><span class="line">[userDefaults <span class="string">setObject:</span>@<span class="string">"userName"</span> <span class="string">forKey:</span>@<span class="string">"userName"</span>];</span><br><span class="line"><span class="comment">//2.1立即同步</span></span><br><span class="line">[userDefaults synchronize];</span><br><span class="line"></span><br><span class="line"><span class="comment">//3.读取文件</span></span><br><span class="line">NSString *userName = [userDefaults <span class="string">objectForKey:</span>@<span class="string">"userName"</span>];</span><br></pre></td></tr></table></figure></span>
+</code></pre><ul>
 <li><p>tmp： 用于存放临时文件,系统在应用程序退出后不定时清除</p>
 <p><code>NSString *path = NSTemporaryDirectory();</code></p>
 </li>
@@ -306,7 +310,7 @@
         <div class="site-state motion-element">
           <div class="site-state-item site-state-posts">
             <a href="/archives">
-              <span class="site-state-item-count">9</span>
+              <span class="site-state-item-count">10</span>
               <span class="site-state-item-name">posts</span>
             </a>
           </div>
