@@ -144,115 +144,6 @@
           
           
             
-              <a class="post-title-link" href="/2015/08/19/ios-dev-network-optimization/">
-                iOS 开发 —— 网络层优化方案
-              </a>
-            
-          
-        </h1>
-      
-
-      <div class="post-meta">
-        <span class="post-time">
-          Posted on 2015-08-19
-        </span>
-
-        
-          <span class="post-category">
-            &nbsp; | &nbsp; In
-            
-              <a href="/categories/iOS/">iOS</a>
-
-              
-              
-
-            
-          </span>
-        
-
-        
-          
-            <span class="post-comments-count">
-            &nbsp; | &nbsp;
-            <a href="/2015/08/19/ios-dev-network-optimization/#comments" >
-              <span class="post-comments-count disqus-comment-count" data-disqus-identifier="2015/08/19/ios-dev-network-optimization/"></span>
-            </a>
-          </span>
-          
-        
-      </div>
-    </div>
-
-    <div class="post-body">
-
-      
-      
-
-      
-        
-          <p>最近公司的 App 做网络层性能优化之后相对没有优化之前有了很大的提升，于是把最近用到的跟查询到的一些网络层优化方案做个总结。</p>
-<p>网络层的优化手段主要从以下三方面考虑：</p>
-<ol>
-<li>针对链接建立环节的优化</li>
-<li>针对链接传输数据量的优化</li>
-<li>针对链接复用的优化</li>
-</ol>
-<h1 id="1-_针对链接建立环节的优化">1. 针对链接建立环节的优化</h1><p>在调用 API 发起请求建立链接的环节，通常分为这些步骤：</p>
-<ol>
-<li>发起请求</li>
-<li>DNS 域名解析得到 IP</li>
-<li>根据 IP 进行三次握手，（HTTPS 四次握手，iOS9以后 Apple 推荐使用 HTTPS），链接建立成功</li>
-</ol>
-<p>&gt;</p>
-<blockquote>
-<h3 id="1-1_针对发起请求的优化手段">1.1 针对发起请求的优化手段</h3></blockquote>
-<ul>
-<li>1.1.1 使用缓存手段减少请求的次数</li>
-</ul>
-<p>对时效性比较长的 API 的数据进行本地缓存，比如公告、产品详情、App 皮肤</p>
-<p>一般是把 API 名字和参数拼成一个字符串然后取 MD5 作为 key，存储对应返回的数据。这样下次有同样请求的时候就可以直接读取这里面的数据。</p>
-<p>关于这里有一个缓存策略的问题需要讨论：什么时候清理缓存？要么就是根据超时时间限制进行清理，要么就是根据缓存数据大小进行清理。这个策略的选择要根据具体 App 的操作日志来决定。比如网络图片缓存，数据量基本都比较大，就应该根据缓存大小来清理的策略。</p>
-<p>当然，有些时效性非常短的API数据，就不能使用这个方法了，比如用户的资金数据，那就需要每次都调用了。</p>
-<ul>
-<li>1.1.2 使用策略来减少请求的发起次数</li>
-</ul>
-<p>界面刷新请求这种，而且存在重复请求的情况（下拉刷新时，在请求着陆之前用户不断执行下拉操作），那么这个时候，后面重复操作导致的API请求就可以不必发送了</p>
-<p>如果是条件筛选这种，那就取消前面已经发送的请求。虽然很有可能这个请求已经被执行了，那么取消所带来的性能提升就基本没有了。但如果这个请求还在队列中待执行的话，那么对应的这次链接就可以省掉了。</p>
-<p>以上是一种，另外一种情况就是请求策略：类似用户操作日志的请求策略。</p>
-<p>用户操作会触发操作日志上报Server，这种请求特别频繁，但是是暗地里进行的，不需要用户对此有所感知。所以也没必要操作一次就发起一次的请求。在这里就可以采用这样的策略：在本地记录用户的操作记录，当记录满30条的时候发起一次请求将操作记录上传到服务器。然后每次App启动的时候，上传一次上次遗留下来没上传的操作记录。这样能够有效降低用户设备的耗电量，同时提升网络层的性能。</p>
-<blockquote>
-<h3 id="小总结">小总结</h3></blockquote>
-<p>针对建立连接这部分的优化就是这样的原则：能不发请求的就尽量不发请求，必须要发请求时，能合并请求的就尽量合并请求。然而，任何优化手段都是有前提的，而且也不能保证对所有需求都能起作用，有些API请求就是不符合这些优化手段前提的，那就老老实实发请求吧。不过这类API请求所占比例一般不大，大部分的请求都或多或少符合优化条件，所以针对发送请求的优化手段还是值得做的。</p>
-
-        
-      
-    </div>
-
-    <div class="post-footer">
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </div>
-  </div>
-
-
-    
-      
-
-  <div class="post post-type-normal ">
-    <div class="post-header">
-
-      
-      
-        <h1 class="post-title">
-          
-          
-            
               <a class="post-title-link" href="/2015/05/19/Yale-open-class-notes/">
                 耶鲁大学《有关实物的心理学、生物学和政治学》笔记
               </a>
@@ -1210,10 +1101,10 @@ if </span>(klass<span class="function">)</span> {
 </ul>
 </li>
 </ul>
-<pre><code>- Preferences：APP 的偏好设置，所以iTunes会同步该文件夹内容。
-
-<span class="comment"><figure class="highlight groovy"><table><tr><td class="code"><pre><span class="line"><span class="comment">//1.获得NSUserDefaults文件</span></span><br><span class="line">NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];</span><br><span class="line"></span><br><span class="line"><span class="comment">//2.向文件中写入内容</span></span><br><span class="line">[userDefaults <span class="string">setObject:</span>@<span class="string">"userName"</span> <span class="string">forKey:</span>@<span class="string">"userName"</span>];</span><br><span class="line"><span class="comment">//2.1立即同步</span></span><br><span class="line">[userDefaults synchronize];</span><br><span class="line"></span><br><span class="line"><span class="comment">//3.读取文件</span></span><br><span class="line">NSString *userName = [userDefaults <span class="string">objectForKey:</span>@<span class="string">"userName"</span>];</span><br></pre></td></tr></table></figure></span>
-</code></pre><ul>
+<ul>
+<li><p>Preferences：APP 的偏好设置，所以iTunes会同步该文件夹内容。</p>
+  <figure class="highlight groovy"><table><tr><td class="code"><pre><span class="line"><span class="comment">//1.获得NSUserDefaults文件</span></span><br><span class="line">NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];</span><br><span class="line"></span><br><span class="line"><span class="comment">//2.向文件中写入内容</span></span><br><span class="line">[userDefaults <span class="string">setObject:</span>@<span class="string">"userName"</span> <span class="string">forKey:</span>@<span class="string">"userName"</span>];</span><br><span class="line"><span class="comment">//2.1立即同步</span></span><br><span class="line">[userDefaults synchronize];</span><br><span class="line"></span><br><span class="line"><span class="comment">//3.读取文件</span></span><br><span class="line">NSString *userName = [userDefaults <span class="string">objectForKey:</span>@<span class="string">"userName"</span>];</span><br></pre></td></tr></table></figure>
+</li>
 <li><p>tmp： 用于存放临时文件,系统在应用程序退出后不定时清除</p>
 <p><code>NSString *path = NSTemporaryDirectory();</code></p>
 </li>
@@ -1365,7 +1256,7 @@ if </span>(klass<span class="function">)</span> {
         <div class="site-state motion-element">
           <div class="site-state-item site-state-posts">
             <a href="/archives">
-              <span class="site-state-item-count">10</span>
+              <span class="site-state-item-count">9</span>
               <span class="site-state-item-name">posts</span>
             </a>
           </div>

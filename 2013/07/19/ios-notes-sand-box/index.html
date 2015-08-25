@@ -206,10 +206,10 @@
 </ul>
 </li>
 </ul>
-<pre><code>- Preferences：APP 的偏好设置，所以iTunes会同步该文件夹内容。
-
-<span class="comment"><figure class="highlight groovy"><table><tr><td class="code"><pre><span class="line"><span class="comment">//1.获得NSUserDefaults文件</span></span><br><span class="line">NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];</span><br><span class="line"></span><br><span class="line"><span class="comment">//2.向文件中写入内容</span></span><br><span class="line">[userDefaults <span class="string">setObject:</span>@<span class="string">"userName"</span> <span class="string">forKey:</span>@<span class="string">"userName"</span>];</span><br><span class="line"><span class="comment">//2.1立即同步</span></span><br><span class="line">[userDefaults synchronize];</span><br><span class="line"></span><br><span class="line"><span class="comment">//3.读取文件</span></span><br><span class="line">NSString *userName = [userDefaults <span class="string">objectForKey:</span>@<span class="string">"userName"</span>];</span><br></pre></td></tr></table></figure></span>
-</code></pre><ul>
+<ul>
+<li><p>Preferences：APP 的偏好设置，所以iTunes会同步该文件夹内容。</p>
+  <figure class="highlight groovy"><table><tr><td class="code"><pre><span class="line"><span class="comment">//1.获得NSUserDefaults文件</span></span><br><span class="line">NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];</span><br><span class="line"></span><br><span class="line"><span class="comment">//2.向文件中写入内容</span></span><br><span class="line">[userDefaults <span class="string">setObject:</span>@<span class="string">"userName"</span> <span class="string">forKey:</span>@<span class="string">"userName"</span>];</span><br><span class="line"><span class="comment">//2.1立即同步</span></span><br><span class="line">[userDefaults synchronize];</span><br><span class="line"></span><br><span class="line"><span class="comment">//3.读取文件</span></span><br><span class="line">NSString *userName = [userDefaults <span class="string">objectForKey:</span>@<span class="string">"userName"</span>];</span><br></pre></td></tr></table></figure>
+</li>
 <li><p>tmp： 用于存放临时文件,系统在应用程序退出后不定时清除</p>
 <p><code>NSString *path = NSTemporaryDirectory();</code></p>
 </li>
@@ -310,7 +310,7 @@
         <div class="site-state motion-element">
           <div class="site-state-item site-state-posts">
             <a href="/archives">
-              <span class="site-state-item-count">10</span>
+              <span class="site-state-item-count">9</span>
               <span class="site-state-item-name">posts</span>
             </a>
           </div>
